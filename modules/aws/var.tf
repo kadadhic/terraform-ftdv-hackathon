@@ -80,7 +80,9 @@ variable "FMC_version" {
     } 
 }
 
-variable "keyname" {}
+variable "keyname" {
+  default = "ciscoKey"
+}
 
 variable "ftd_size" {
   default = "c5.4xlarge"
