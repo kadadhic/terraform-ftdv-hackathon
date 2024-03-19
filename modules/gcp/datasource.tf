@@ -1,11 +1,11 @@
 ###############
 # Data Sources
 ###############
-data "google_compute_zones" "available" {
-  project = var.project_id
-  region  = var.region
-  status  = "UP"
-}
+# data "google_compute_zones" "available" {
+#   project = var.project_id
+#   region  = var.region
+#   status  = "UP"
+# }
 
 data "google_compute_image" "ftd" {
   project = "cisco-public"
@@ -21,9 +21,9 @@ data "template_file" "startup_script_ftd" {
   template = file("${path.module}/templates/${var.day_0_config_ftd}")
   vars = {
     admin_password = var.admin_password
-    fmc_ip = "10.10.2.20"
-    reg_key = "cisco"
-    fmc_nat_id = ""
+    fmc_ip         = "10.10.2.20"
+    reg_key        = "cisco"
+    fmc_nat_id     = ""
   }
 }
 data "template_file" "startup_script_fmc" {
