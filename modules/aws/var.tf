@@ -66,18 +66,10 @@ variable "prefix" {
   default = "C15C0"
 }
 variable "FTD_version" {
-    default = "ftdv-7.3.0"
-    validation {
-        condition     = contains(["ftdv-7.0.5", "ftdv-7.1.0", "ftdv-7.2.4","ftdv-7.3.0"], var.FTD_version)
-        error_message = "Valid values for var: FTD_version are (ftdv-7.0.5, ftdv-7.1.0, ftdv-7.2.4, ftdv-7.3.0)."
-    } 
+    default = "ftdv-7.4.2"
 }
 variable "FMC_version" {
-    default = "fmcv-7.3.0"
-    validation {
-        condition     = contains(["fmcv-7.0.5", "fmcv-7.1.0", "fmcv-7.2.4","fmcv-7.3.0"], var.FMC_version)
-        error_message = "Valid values for var: fmc_version are (fmcv-7.0.5, fmcv-7.1.0, fmcv-7.2.4, fmcv-7.3.0)."
-    } 
+    default = "fmcv-7.4.2"
 }
 
 variable "keyname" {
