@@ -47,8 +47,6 @@ resource "aws_subnet" "inside_subnet" {
     Name = "${var.prefix}-inside subnet"
   }
 }
-
-
 #################################################################################################################################
 # Security Group
 #################################################################################################################################
@@ -243,7 +241,7 @@ resource "aws_instance" "ftdv" {
   count               = var.create_fmc?1:0
   ami                 = data.aws_ami.ftdv.id
   instance_type       = var.ftd_size
-  key_name            = var.keyname
+  key_name            = var.keyname 
   network_interface {
     network_interface_id = aws_network_interface.ftd01mgmt.id
     device_index         = 0
@@ -270,7 +268,7 @@ resource "aws_instance" "ftdv-solo" {
   count               = var.create_fmc?0:1
   ami                 = data.aws_ami.ftdv.id
   instance_type       = var.ftd_size
-  key_name            = var.keyname
+  key_name            = var.keyname 
   network_interface {
     network_interface_id = aws_network_interface.ftd01mgmt.id
     device_index         = 0
@@ -297,7 +295,7 @@ resource "aws_instance" "fmcv" {
   count               = var.create_fmc?1:0
   ami                 = data.aws_ami.fmcv[0].id
   instance_type       = "c5.4xlarge"
-  key_name            = var.keyname   
+  key_name            = var.keyname 
   network_interface {
     network_interface_id = aws_network_interface.fmcmgmt[0].id
     device_index         = 0
@@ -305,5 +303,24 @@ resource "aws_instance" "fmcv" {
   user_data = data.template_file.fmc_startup_file[0].rendered
   tags = {
     Name = "${var.prefix}-Cisco FMCv"
+  }
+}
+
+locals{
+  fmc_ip = var.create_fmc ? aws_eip.fmcmgmt-EIP[0].public_ip: var.fmc_ip 
+}
+
+##########################################################################
+# SSH Keys
+##########################################################################
+resource "time_sleep" "wait_30_min" {
+  depends_on = [aws_instance.fmcv]
+  create_duration = "30s"
+}
+resource "null_resource" "cluster" {
+  depends_on = [ time_sleep.wait_30_min ]
+  provisioner "local-exec" {
+      command = "terraform init && terraform apply -auto-approve -var='fmc_host=${local.fmc_ip}'"
+      working_dir = "${path.module}/fmc"
   }
 }
