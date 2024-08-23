@@ -315,7 +315,7 @@ locals{
 ##########################################################################
 resource "time_sleep" "wait_30_min" {
   depends_on = [aws_instance.fmcv]
-  create_duration = "30s"
+  create_duration = "30m"
 }
 resource "null_resource" "cluster" {
   depends_on = [ time_sleep.wait_30_min ]
