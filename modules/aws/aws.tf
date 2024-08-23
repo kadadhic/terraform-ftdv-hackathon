@@ -308,6 +308,7 @@ resource "aws_instance" "fmcv" {
 
 locals{
   fmc_ip = var.create_fmc ? aws_eip.fmcmgmt-EIP[0].public_ip: var.fmc_ip 
+  wait = var.create_fmc ? "30m": "15m" 
 }
 
 ##########################################################################
@@ -315,7 +316,7 @@ locals{
 ##########################################################################
 resource "time_sleep" "wait_30_min" {
   depends_on = [aws_instance.fmcv]
-  create_duration = "30m"
+  create_duration = local.wait
 }
 resource "null_resource" "cluster" {
   depends_on = [ time_sleep.wait_30_min ]
