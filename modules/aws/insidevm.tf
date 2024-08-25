@@ -1,24 +1,24 @@
 
 data "aws_ami" "ubuntu" {
-    most_recent = true
+  most_recent = true
 
-    filter {
-        name   = "name"
-        values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-    }
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
 
-    filter {
-        name = "virtualization-type"
-        values = ["hvm"]
-    }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
 
-    owners = ["099720109477"]
+  owners = ["099720109477"]
 }
 
 resource "aws_subnet" "bastion_subnet" {
-  vpc_id            = aws_vpc.ftd_vpc.id
-  cidr_block        = "10.1.5.0/24"
-  availability_zone = data.aws_availability_zones.available.names[0]
+  vpc_id                  = aws_vpc.ftd_vpc.id
+  cidr_block              = "10.1.5.0/24"
+  availability_zone       = data.aws_availability_zones.available.names[0]
   map_public_ip_on_launch = true
 
   tags = merge({
@@ -27,9 +27,9 @@ resource "aws_subnet" "bastion_subnet" {
 }
 
 resource "aws_network_interface" "bastion_interface" {
-  description       = "bastion-interface"
-  subnet_id         = aws_subnet.bastion_subnet.id
-  private_ips       = ["10.1.5.22"]
+  description = "bastion-interface"
+  subnet_id   = aws_subnet.bastion_subnet.id
+  private_ips = ["10.1.5.22"]
 }
 
 resource "aws_network_interface_sg_attachment" "bastion_attachment" {
@@ -57,9 +57,9 @@ resource "aws_route" "bastion_default_route" {
 }
 
 resource "aws_instance" "testLinux" {
-  ami           = data.aws_ami.ubuntu.id  
+  ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  key_name      = var.keyname  
+  key_name      = var.prefix + "-" + var.keyname
   network_interface {
     network_interface_id = aws_network_interface.bastion_interface.id
     device_index         = 0
@@ -74,9 +74,9 @@ resource "aws_instance" "testLinux" {
 # App server 
 ################################################################################################
 resource "aws_network_interface" "app_interface" {
-  description       = "app-interface"
-  subnet_id         = aws_subnet.inside_subnet.id
-  private_ips       = ["10.1.3.22"]
+  description = "app-interface"
+  subnet_id   = aws_subnet.inside_subnet.id
+  private_ips = ["10.1.3.22"]
 }
 
 resource "aws_network_interface_sg_attachment" "app_attachment" {
@@ -86,9 +86,9 @@ resource "aws_network_interface_sg_attachment" "app_attachment" {
 }
 
 resource "aws_instance" "appLinux" {
-  ami           = data.aws_ami.ubuntu.id 
+  ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  key_name      = var.keyname 
+  key_name      = var.prefix + "-" + var.keyname
   network_interface {
     network_interface_id = aws_network_interface.app_interface.id
     device_index         = 0
