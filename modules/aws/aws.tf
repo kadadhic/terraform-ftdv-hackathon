@@ -328,7 +328,7 @@ resource "null_resource" "cluster" {
 
   provisioner "local-exec" {
     when        = destroy
-    command     = "rm terraform.tfstate"
+    command     = "rm terraform.tfstate*"
     working_dir = "${path.module}/fmc"
   }
 }
