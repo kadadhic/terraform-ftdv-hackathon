@@ -59,7 +59,7 @@ resource "aws_route" "bastion_default_route" {
 resource "aws_instance" "testLinux" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  key_name      = var.prefix + "-" + var.keyname
+  key_name      = "${var.prefix}-${var.keyname}"
   network_interface {
     network_interface_id = aws_network_interface.bastion_interface.id
     device_index         = 0
@@ -88,7 +88,7 @@ resource "aws_network_interface_sg_attachment" "app_attachment" {
 resource "aws_instance" "appLinux" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  key_name      = var.prefix + "-" + var.keyname
+  key_name      = "${var.prefix}-${var.keyname}"
   network_interface {
     network_interface_id = aws_network_interface.app_interface.id
     device_index         = 0

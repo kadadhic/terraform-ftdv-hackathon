@@ -6,6 +6,8 @@ data "aws_ami" "ftdv" {
     values = ["${var.FTD_version}*"]
   }
 
+  include_deprecated = true
+
   filter {
     name   = "product-code"
     values = ["a8sxy6easi2zumgtyr564z6y7"]
@@ -30,13 +32,15 @@ data "template_file" "ftd_solo_startup_file" {
   }
 }
 data "aws_ami" "fmcv" {
-  #most_recent = true      // you can enable this if you want to deploy more
-  count  = var.create_fmc ? 1 : 0
-  owners = ["aws-marketplace"]
+  most_recent = true // you can enable this if you want to deploy more
+  count       = var.create_fmc ? 1 : 0
+  owners      = ["aws-marketplace"]
   filter {
     name   = "name"
     values = ["${var.FMC_version}*"]
   }
+
+  include_deprecated = true
 
   filter {
     name   = "product-code"

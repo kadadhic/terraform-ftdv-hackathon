@@ -241,7 +241,7 @@ resource "aws_instance" "ftdv" {
   count         = var.create_fmc ? 1 : 0
   ami           = data.aws_ami.ftdv.id
   instance_type = var.ftd_size
-  key_name      = var.prefix + "-" + var.keyname
+  key_name      = "${var.prefix}-${var.keyname}"
   network_interface {
     network_interface_id = aws_network_interface.ftd01mgmt.id
     device_index         = 0
@@ -268,7 +268,7 @@ resource "aws_instance" "ftdv-solo" {
   count         = var.create_fmc ? 0 : 1
   ami           = data.aws_ami.ftdv.id
   instance_type = var.ftd_size
-  key_name      = var.prefix + "-" + var.keyname
+  key_name      = "${var.prefix}-${var.keyname}"
   network_interface {
     network_interface_id = aws_network_interface.ftd01mgmt.id
     device_index         = 0
@@ -295,7 +295,7 @@ resource "aws_instance" "fmcv" {
   count         = var.create_fmc ? 1 : 0
   ami           = data.aws_ami.fmcv[0].id
   instance_type = "c5.4xlarge"
-  key_name      = var.prefix + "-" + var.keyname
+  key_name      = "${var.prefix}-${var.keyname}"
   network_interface {
     network_interface_id = aws_network_interface.fmcmgmt[0].id
     device_index         = 0
