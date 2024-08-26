@@ -307,8 +307,8 @@ resource "aws_instance" "fmcv" {
 }
 
 locals {
-  fmc_ip = var.create_fmc ? aws_eip.fmcmgmt-EIP[0].public_ip : var.fmc_ip
-  wait   = var.create_fmc ? "30m" : "15m"
+  fmc_ip = var.create_fmc ? aws_eip.fmcmgmt-EIP[0].public_ip : var.fmc_host
+  wait   = var.create_fmc ? "30m" : "12m"
 }
 
 ##########################################################################
