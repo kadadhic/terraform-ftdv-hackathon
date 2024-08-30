@@ -225,3 +225,8 @@ variable "rta" {
   type = bool
   default = true
 }
+variable "keyname" {
+  type        = string
+  description = "key to be used for the instances"
+  default = "fireglass-key"
+}

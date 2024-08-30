@@ -56,7 +56,7 @@ resource "aws_lb" "external01_lb" {
 
 resource "aws_lb_target_group" "front_end1_1" {
   count       = length(var.listener_ports)
-  name        = tostring("fe1-1-${lookup(var.listener_ports[count.index], "port", null)}")
+  name        = "${var.prefix}-target-group${count.index}"
   port        = lookup(var.listener_ports[count.index], "port", null)
   protocol    = lookup(var.listener_ports[count.index], "protocol", null)
   target_type = "ip"
@@ -217,7 +217,7 @@ resource "aws_network_interface_sg_attachment" "ftd_app_attachment" {
 
 resource "aws_instance" "EC2-Ubuntu" {
   depends_on = [ module.service_network,module.service_network ]
-  ami           = "ami-0e86e20dae9224db8" 
+  ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
   key_name      = "${var.prefix}-${var.keyname}"//var.keyname
   
@@ -230,4 +230,20 @@ resource "aws_instance" "EC2-Ubuntu" {
   tags = {
     Name = "${var.prefix}-Inside-Machine"
   }
+}
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"]
 }
