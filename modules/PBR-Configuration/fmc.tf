@@ -224,7 +224,7 @@ resource "fmc_ftd_autonat_rules" "nat_rule02" {
 resource "fmc_devices" "device01"{
   depends_on = [fmc_access_policies.access_policy,fmc_ftd_nat_policies.nat_policy, fmc_security_zone.inside, fmc_security_zone.outside01,fmc_security_zone.outside02]
   name = "NGFW01"
-  hostname = "172.16.0.10"//"172.16.1.10"
+  hostname = "172.16.1.10"
   regkey = "cisco"
   license_caps = [ "BASE" ]
   access_policy {
@@ -236,7 +236,7 @@ resource "fmc_devices" "device01"{
 resource "fmc_devices" "device02"{
   depends_on = [fmc_devices.device01 ,fmc_access_policies.access_policy,fmc_ftd_nat_policies.nat_policy, fmc_security_zone.inside, fmc_security_zone.outside02]
   name = "NGFW02"
-  hostname = "172.16.0.200"//"172.16.11.10"
+  hostname = "172.16.11.10"
   regkey = "cisco"
   license_caps = [ "BASE" ]
   access_policy {
@@ -397,12 +397,21 @@ resource "fmc_policy_devices_assignments" "policy_assignment02" {
   }
 }
 
-resource "null_resource" "run_python_script" {
+
+resource "null_resource" "install_fmcapi" {
   provisioner "local-exec" {
-    command = "python3 ./testing.py --addr https://<> --username tfuser --password Cisco123"
+    command = "pip3 install fmcapi"
   }
 
   depends_on = [fmc_policy_devices_assignments.policy_assignment01,fmc_policy_devices_assignments.policy_assignment02]
+}
+
+resource "null_resource" "run_python_script" {
+  provisioner "local-exec" {
+    command = "python3 ./testing.py --addr ${var.fmc_host} --username ${var.fmc_username} --password ${var.fmc_password}"
+  }
+
+  depends_on = [fmc_policy_devices_assignments.policy_assignment01,fmc_policy_devices_assignments.policy_assignment02,null_resource.install_fmcapi]
 }
 
 
