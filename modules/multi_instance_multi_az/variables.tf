@@ -134,7 +134,7 @@ variable "outside_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["128.107.84.92/32"]
     description = "Outside Interface SG"
   }]
 }
@@ -152,7 +152,7 @@ variable "inside_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["128.107.84.92/32"]
     description = "Inside Interface SG"
   }]
 }
@@ -170,7 +170,7 @@ variable "mgmt_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["128.107.84.92/32"]
     description = "Mgmt Interface SG"
   }]
 }
@@ -188,7 +188,7 @@ variable "fmc_mgmt_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["128.107.84.92/32"]
     description = "FMC Mgmt Interface SG"
   }]
 }
