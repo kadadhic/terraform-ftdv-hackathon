@@ -44,7 +44,7 @@ resource "aws_instance" "ftdv" {
   }
   user_data = data.template_file.ftd_startup_file[count.index].rendered
   tags = merge({
-    Name = "Cisco ftdv${count.index}"
+    Name = "${var.prefix}-Cisco ftdv${count.index}"
   }, var.tags)
 }
 
@@ -59,6 +59,6 @@ resource "aws_instance" "fmcv" {
   }
   user_data = data.template_file.fmc_startup_file[0].rendered
   tags = {
-    Name = "Cisco FMCv"
+    Name = "${var.prefix}-Cisco FMCv"
   }
 }

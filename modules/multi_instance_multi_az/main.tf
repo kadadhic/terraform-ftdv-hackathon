@@ -22,6 +22,7 @@ module "service_network" {
   fmc_mgmt_interface_sg = var.fmc_mgmt_interface_sg
   use_fmc_eip           = var.use_fmc_eip
   use_ftd_eip           = var.use_ftd_eip
+  prefix = var.prefix
 }
 
 module "instance" {
@@ -39,6 +40,7 @@ module "instance" {
   reg_key                 = var.reg_key
   fmc_nat_id              = var.fmc_nat_id 
   create_fmc              = var.create_fmc
+  prefix = var.prefix
 }
 
 #########################################################################################################
@@ -46,7 +48,7 @@ module "instance" {
 #########################################################################################################
 
 resource "aws_lb" "external01_lb" {
-  name                             = "External01-LB"
+  name                             = "${var.prefix}-External01-LB"
   load_balancer_type               = "network"
   enable_cross_zone_load_balancing = "true"
   subnets                          = module.service_network.outside_subnet
@@ -102,7 +104,7 @@ data "aws_vpc" "fireglass-vpc"{
   depends_on = [module.service_network]
   filter {
     name   = "tag:Name"
-    values = ["FireGlass-VPC"]
+    values = ["${var.prefix}-FireGlass-VPC"]
   }
 }
 
@@ -136,7 +138,7 @@ resource "aws_subnet" "public_subnet" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
-    Name = "Public-subnet-${count.index+1}"
+    Name = "${var.prefix}-Public-subnet-${count.index+1}"
   }
 }
 
@@ -153,7 +155,7 @@ resource "aws_route_table" "ftd_public_route" {
   count  = 2 //length(local.outside_subnet)
   vpc_id = data.aws_vpc.fireglass-vpc.id//local.con
   tags = {
-    Name = "public network Routing table"
+    Name = "${var.prefix}-public network Routing table"
   }
 }
 
@@ -165,9 +167,8 @@ resource "aws_route_table_association" "public_association" {
 
 resource "aws_eip" "ftd_public_eip" {
   count = 2 //var.use_ftd_eip ? length(var.mgmt_subnet_name) : 0
-  vpc   = true
   tags = {
-    "Name" = "fireglass-ftd-${count.index} public IP"
+    "Name" = "${var.prefix}-fireglass-ftd-${count.index} public IP"
   }
 }
 
@@ -186,7 +187,7 @@ data "aws_subnet" "inside-subnet" {
 depends_on = [module.service_network]
   filter {
     name   = "tag:Name"
-    values = ["inside_subnet-1"]
+    values = ["${var.prefix}-inside_subnet-1"]
   }
 }
 
@@ -194,7 +195,7 @@ data "aws_security_group" "inside-sg"{
   depends_on = [module.service_network]
   filter {
     name   = "tag:Name"
-    values = ["Inside-InterfaceSG"]
+    values = ["${var.prefix}-Inside-InterfaceSG"]
   }
 }
 
@@ -227,6 +228,6 @@ resource "aws_instance" "EC2-Ubuntu" {
   }
 
   tags = {
-    Name = "Inside-Machine"
+    Name = "${var.prefix}-Inside-Machine"
   }
 }

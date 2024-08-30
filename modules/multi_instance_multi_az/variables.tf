@@ -9,7 +9,9 @@ variable "aws_secret_key" {
   description = "AWS SECRET KEY"
   default = ""
 }
-
+variable "prefix" {
+  type        = string
+}
 variable "region" {
   type        = string
   description = "AWS REGION"

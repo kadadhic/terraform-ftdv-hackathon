@@ -12,7 +12,9 @@ variable "vpc_name" {
   type        = string
   default     = "IAC-VPC"
 }
-
+variable "prefix" {
+  type        = string
+}
 variable "create_igw" {
   description = "Condition to create IGW"
   type        = bool

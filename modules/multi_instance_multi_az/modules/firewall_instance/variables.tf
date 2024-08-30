@@ -10,7 +10,9 @@ variable "ftd_version" {
     condition     = can(regex("^ftdv-.*", var.ftd_version))
   }
 }
-
+variable "prefix" {
+  type        = string
+}
 variable "create_fmc" {
   description = "Boolean value to create FMC or not"
   type        = bool

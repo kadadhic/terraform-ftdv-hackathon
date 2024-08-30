@@ -12,7 +12,7 @@ resource "aws_vpc" "ftd_vpc" {
   #enable_classiclink   = false
   instance_tenancy     = "default"
   tags = merge({
-    Name = var.vpc_name
+    Name = "${var.prefix}-${var.vpc_name}"
   }, var.tags)
 }
 
@@ -23,7 +23,7 @@ resource "aws_subnet" "mgmt_subnet" {
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = false
   tags = merge({
-    Name = "${var.mgmt_subnet_name[count.index]}"
+    Name = "${var.prefix}-${var.mgmt_subnet_name[count.index]}"
   }, var.tags)
 }
 
@@ -34,7 +34,7 @@ resource "aws_subnet" "outside_subnet" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = merge({
-    Name = var.outside_subnet_name[count.index]
+    Name = "${var.prefix}-${var.outside_subnet_name[count.index]}"
   }, var.tags)
 }
 
@@ -45,7 +45,7 @@ resource "aws_subnet" "inside_subnet" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = merge({
-    Name = var.inside_subnet_name[count.index]
+    Name = "${var.prefix}-${var.inside_subnet_name[count.index]}"
   }, var.tags)
 }
 
@@ -56,7 +56,7 @@ resource "aws_subnet" "diag_subnet" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = merge({
-    Name = var.diag_subnet_name[count.index]
+    Name = "${var.prefix}-${var.diag_subnet_name[count.index]}"
   }, var.tags)
 }
 
@@ -65,11 +65,11 @@ resource "aws_subnet" "diag_subnet" {
 # # #################################################################################################################################
 
 resource "aws_security_group" "outside_sg" {
-  name        = "Outside-InterfaceSG"
+  name        = "${var.prefix}-Outside-InterfaceSG"
   vpc_id      = local.con
   description = "Secure Firewall OutsideSG"
    tags = {
-    Name = "Outside-InterfaceSG"
+    Name = "${var.prefix}-Outside-InterfaceSG"
   }
 }
 
@@ -98,11 +98,11 @@ resource "aws_security_group_rule" "outside_sg_egress" {
 }
 
 resource "aws_security_group" "inside_sg" {
-  name        = "Inside InterfaceSG"
+  name        = "${var.prefix}-Inside InterfaceSG"
   vpc_id      = local.con
   description = "Secure Firewall InsideSG"
    tags = {
-    Name = "Inside-InterfaceSG"
+    Name = "${var.prefix}-Inside-InterfaceSG"
   }
 }
 
@@ -131,9 +131,9 @@ resource "aws_security_group_rule" "inside_sg_egress" {
 }
 
 resource "aws_security_group" "mgmt_sg" {
-  name        = "FTD Management InterfaceSG"
+  name        = "${var.prefix}-FTD Management InterfaceSG"
   vpc_id      = local.con
-  description = "Secure Firewall MGMTSG"
+  description = "${var.prefix}-Secure Firewall MGMTSG"
 }
 
 # tfsec:ignore:aws-vpc-add-description-to-security-group-rule
@@ -162,7 +162,7 @@ resource "aws_security_group_rule" "mgmt_sg_egress" {
 
 resource "aws_security_group" "fmc_mgmt_sg" {
   count       = var.create_fmc ? 1 : 0
-  name        = "FMC Management InterfaceSG"
+  name        = "${var.prefix}-FMC Management InterfaceSG"
   vpc_id      = local.con
   description = "Secure Firewall FMC MGMTSG"
 }
@@ -264,7 +264,7 @@ resource "aws_network_interface" "ftd_inside" {
 
 resource "aws_network_interface" "ftd_diag" {
   count             = length(var.diag_subnet_cidr) != 0 ? length(var.diag_subnet_cidr) : (length(var.diag_subnet_name) != 0 ? length(var.diag_subnet_name) : 0)
-  description       = "asa{count.index}-diag"
+  description       = "asa${count.index}-diag"
   subnet_id         = local.diag_subnet[local.azs[count.index] - 1].id
   source_dest_check = false
   private_ips       = [var.ftd_diag_ip[count.index]]
@@ -300,7 +300,7 @@ resource "aws_internet_gateway" "int_gw" {
   count  = var.create_igw ? 1 : 0
   vpc_id = local.con
   tags = merge({
-    Name = "Internet Gateway"
+    Name = "${var.prefix}-Internet Gateway"
   }, var.tags)
 }
 
@@ -313,7 +313,7 @@ resource "aws_route_table" "ftd_mgmt_route" {
   }
 
   tags = merge({
-    Name = "Management network Routing table"
+    Name = "${var.prefix}-Management network Routing table"
   }, var.tags)
 }
 
@@ -321,7 +321,7 @@ resource "aws_route_table" "ftd_outside_route" {
   count  = length(local.outside_subnet)
   vpc_id = local.con
   tags = merge({
-    Name = "outside network Routing table"
+    Name = "${var.prefix}-outside network Routing table"
   }, var.tags)
 }
 
@@ -329,7 +329,7 @@ resource "aws_route_table" "ftd_inside_route" {
   count  = length(local.inside_subnet)
   vpc_id = local.con
   tags = merge({
-    Name = "inside network Routing table"
+    Name = "${var.prefix}-inside network Routing table"
   }, var.tags)
 }
 
@@ -337,7 +337,7 @@ resource "aws_route_table" "ftd_diag_route" {
   count  = length(local.diag_subnet)
   vpc_id = local.con
   tags = merge({
-    Name = "diag network Routing table"
+    Name = "${var.prefix}-diag network Routing table"
   }, var.tags)
 }
 
@@ -371,7 +371,6 @@ resource "aws_route_table_association" "diag_association" {
 
 resource "aws_eip" "ftd_mgmt_eip" {
   count = 2//var.use_ftd_eip ? length(var.mgmt_subnet_name) : 0
-  vpc   = true
   tags = merge({
     "Name" = "fireglass-ftd-${count.index} Management IP"
   }, var.tags)
@@ -385,9 +384,8 @@ resource "aws_eip_association" "ftd_mgmt_ip_assocation" {
 
 resource "aws_eip" "ftd_outside_eip" {
   count = 2 //var.use_ftd_eip ? length(var.mgmt_subnet_name) : 0
-  vpc   = true
   tags = merge({
-    "Name" = "fireglass-ftd-${count.index} outside IP"
+    "Name" = "${var.prefix}-fireglass-ftd-${count.index} outside IP"
   }, var.tags)
 }
 
@@ -399,9 +397,8 @@ resource "aws_eip_association" "ftd_outside_ip_assocation" {
 
 resource "aws_eip" "fmcmgmt_eip" {
   count = var.use_fmc_eip ? 1 : 0
-  vpc   = true
   tags = {
-    "Name" = "FMCv Management IP"
+    "Name" = "${var.prefix}-FMCv Management IP"
   }
 }
 
