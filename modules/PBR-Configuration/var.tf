@@ -4,7 +4,7 @@ variable "fmc_host" {
 }
 
 variable "fmc_username" {
-  default = "admin"
+  default = ""
 }
 
 variable "fmc_password" {

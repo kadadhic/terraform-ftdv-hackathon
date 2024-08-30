@@ -15,61 +15,67 @@ provider "fmc" {
 }
 
 
-resource "fmc_smart_license" "registration" {
-  registration_type = "EVALUATION"
-}
+# resource "fmc_smart_license" "registration" {
+#   registration_type = "EVALUATION"
+# }
 # ################################################################################################
 # # Data blocks
 # ################################################################################################
 data "fmc_network_objects" "any-ipv4"{
-    depends_on = [ fmc_smart_license.registration ]
+    # depends_on = [ fmc_smart_license.registration ]
     name = "any-ipv4"
 }
 #1st device
 data "fmc_device_physical_interfaces" "zero_physical_interface_device01" {
-    depends_on = [ fmc_smart_license.registration ]
+    # depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device01.id
     name = "TenGigabitEthernet0/0"
 }
 data "fmc_device_physical_interfaces" "one_physical_interface_device01" {
-    depends_on = [ fmc_smart_license.registration ]
+    # depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device01.id
     name = "TenGigabitEthernet0/1"
 }
 data "fmc_device_physical_interfaces" "two_physical_interface_device01" {
-    depends_on = [ fmc_smart_license.registration ]
+    # depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device01.id
     name = "TenGigabitEthernet0/2"
 }
 #2nd device
 data "fmc_device_physical_interfaces" "zero_physical_interface_device02" {
-    depends_on = [ fmc_smart_license.registration ]
+    # depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device02.id
     name = "TenGigabitEthernet0/0"
 }
 data "fmc_device_physical_interfaces" "one_physical_interface_device02" {
-    depends_on = [ fmc_smart_license.registration ]
+    # depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device02.id
-    name = "TenGigabitEthernet0/0"
+    name = "TenGigabitEthernet0/1"
 }
 data "fmc_device_physical_interfaces" "two_physical_interface_device02" {
-    depends_on = [ fmc_smart_license.registration ]
+    # depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device02.id
-    name = "TenGigabitEthernet0/0"
+    name = "TenGigabitEthernet0/2"
 }
 ################################################################################################
 # Security Zones
 ################################################################################################
 resource "fmc_security_zone" "inside" {
-  depends_on = [ fmc_smart_license.registration ]
+  # depends_on = [ fmc_smart_license.registration ]
   name            = "InZone"
   interface_mode  = "ROUTED"
 }
-resource "fmc_security_zone" "outside" {
-  depends_on = [ fmc_smart_license.registration ]
-  name            = "OutZone"
+resource "fmc_security_zone" "outside01" {
+  # depends_on = [ fmc_smart_license.registration ]
+  name            = "OutZone01"
   interface_mode  = "ROUTED"
 }
+resource "fmc_security_zone" "outside02" {
+  # depends_on = [ fmc_smart_license.registration ]
+  name            = "OutZone02"
+  interface_mode  = "ROUTED"
+}
+
 ################################################################################################
 # Network & Host Object
 ################################################################################################
@@ -137,7 +143,11 @@ resource "fmc_access_rules" "access_rule" {
     }
     destination_zones {
         destination_zone {
-            id = fmc_security_zone.outside.id
+            id = fmc_security_zone.outside01.id
+            type = "SecurityZone"
+        }
+        destination_zone {
+            id = fmc_security_zone.outside02.id
             type = "SecurityZone"
         }
     }
@@ -151,33 +161,70 @@ resource "fmc_ftd_nat_policies" "nat_policy" {
     description = "Nat policy by terraform"
 }
 
-# resource "fmc_ftd_manualnat_rules" "new_rule" {
-#     nat_policy = fmc_ftd_nat_policies.nat_policy.id
-#     nat_type = "static"
-#     original_source{
-#         id = fmc_network_objects.corporate-lan.id
-#         type = fmc_network_objects.corporate-lan.type
-#     }
-#     source_interface {
-#         id = fmc_security_zone.inside.id
-#         type = "SecurityZone"
-#     }
-#     destination_interface {
-#         id = fmc_security_zone.outside.id
-#         type = "SecurityZone"
-#     }
+resource "fmc_ftd_autonat_rules" "nat_rule01" {
+    nat_policy = fmc_ftd_nat_policies.nat_policy.id
+    description = "Created using terraform"
+    nat_type = "static"
+    source_interface {
+        id = fmc_security_zone.inside.id
+        type = "SecurityZone"//fmc_security_zone.inside.type
+    }
+    destination_interface {
+        id = fmc_security_zone.outside01.id
+        type = "SecurityZone"//fmc_security_zone.outside01.type
+    }
+    original_network {
+        id = fmc_network_objects.corporate-lan01.id
+        type = fmc_network_objects.corporate-lan01.type
+    }
+    # translated_network {
+    #     id = data.fmc_network_objects.public.id
+    #     type = data.fmc_network_objects.public.type
+    # }
+    translated_network_is_destination_interface = true
+    # original_port {
+    #     port = 53
+    #     protocol = "udp"
+    # }
+    # translated_port = 5353
+    # ipv6 = true
+}
 
-#     # interface_in_original_destination = true
-#     interface_in_translated_source = true
-# }
-
+resource "fmc_ftd_autonat_rules" "nat_rule02" {
+    nat_policy = fmc_ftd_nat_policies.nat_policy.id
+    description = "Created using terraform"
+    nat_type = "static"
+    source_interface {
+        id = fmc_security_zone.inside.id
+        type = "SecurityZone"//fmc_security_zone.inside.type
+    }
+    destination_interface {
+        id = fmc_security_zone.outside02.id
+        type = "SecurityZone"//fmc_security_zone.outside02.type
+    }
+    original_network {
+        id = fmc_network_objects.corporate-lan01.id
+        type = fmc_network_objects.corporate-lan01.type
+    }
+    # translated_network {
+    #     id = data.fmc_network_objects.public.id
+    #     type = data.fmc_network_objects.public.type
+    # }
+    translated_network_is_destination_interface = true
+    # original_port {
+    #     port = 53
+    #     protocol = "udp"
+    # }
+    # translated_port = 5353
+    # ipv6 = true
+}
 ################################################################################################
 # FTDv Onboarding
 ################################################################################################
 resource "fmc_devices" "device01"{
-  depends_on = [fmc_ftd_nat_policies.nat_policy, fmc_security_zone.inside, fmc_security_zone.outside]
+  depends_on = [fmc_access_policies.access_policy,fmc_ftd_nat_policies.nat_policy, fmc_security_zone.inside, fmc_security_zone.outside01,fmc_security_zone.outside02]
   name = "NGFW01"
-  hostname = "172.16.1.10"
+  hostname = "172.16.0.10"//"172.16.1.10"
   regkey = "cisco"
   license_caps = [ "BASE" ]
   access_policy {
@@ -187,9 +234,9 @@ resource "fmc_devices" "device01"{
 }
 
 resource "fmc_devices" "device02"{
-  depends_on = [fmc_ftd_nat_policies.nat_policy, fmc_security_zone.inside, fmc_security_zone.outside]
+  depends_on = [fmc_devices.device01 ,fmc_access_policies.access_policy,fmc_ftd_nat_policies.nat_policy, fmc_security_zone.inside, fmc_security_zone.outside02]
   name = "NGFW02"
-  hostname = "172.16.11.10"
+  hostname = "172.16.0.200"//"172.16.11.10"
   regkey = "cisco"
   license_caps = [ "BASE" ]
   access_policy {
@@ -206,7 +253,7 @@ resource "fmc_device_physical_interfaces" "physical_interfaces00" {
     device_id = fmc_devices.device01.id
     physical_interface_id= data.fmc_device_physical_interfaces.zero_physical_interface_device01.id
     name =   data.fmc_device_physical_interfaces.zero_physical_interface_device01.name
-    security_zone_id= fmc_security_zone.outside.id
+    security_zone_id= fmc_security_zone.outside01.id
     if_name = "outside01"
     description = "Applied by terraform"
     mtu =  1500
@@ -218,7 +265,7 @@ resource "fmc_device_physical_interfaces" "physical_interfaces01" {
     device_id = fmc_devices.device01.id
     physical_interface_id= data.fmc_device_physical_interfaces.one_physical_interface_device01.id
     name =   data.fmc_device_physical_interfaces.one_physical_interface_device01.name
-    security_zone_id= fmc_security_zone.inside.id
+    security_zone_id= fmc_security_zone.outside02.id
     if_name = "outside02"
     description = "Applied by terraform"
     mtu =  1500
@@ -229,7 +276,7 @@ resource "fmc_device_physical_interfaces" "physical_interfaces01" {
 
 resource "fmc_device_physical_interfaces" "physical_interfaces02" {
     device_id = fmc_devices.device01.id
-    physical_interface_id= data.fmc_device_physical_interfaces.one_physical_interface_device01.id
+    physical_interface_id= data.fmc_device_physical_interfaces.two_physical_interface_device01.id
     name =   data.fmc_device_physical_interfaces.two_physical_interface_device01.name
     security_zone_id= fmc_security_zone.inside.id
     if_name = "inside"
@@ -245,7 +292,7 @@ resource "fmc_device_physical_interfaces" "physical_interfaces10" {
     device_id = fmc_devices.device02.id
     physical_interface_id= data.fmc_device_physical_interfaces.zero_physical_interface_device02.id
     name =   data.fmc_device_physical_interfaces.zero_physical_interface_device02.name
-    security_zone_id= fmc_security_zone.outside.id
+    security_zone_id= fmc_security_zone.outside01.id
     if_name = "outside01"
     description = "Applied by terraform"
     mtu =  1500
@@ -259,7 +306,7 @@ resource "fmc_device_physical_interfaces" "physical_interfaces11" {
     device_id = fmc_devices.device02.id
     physical_interface_id= data.fmc_device_physical_interfaces.one_physical_interface_device02.id
     name =   data.fmc_device_physical_interfaces.one_physical_interface_device02.name
-    security_zone_id= fmc_security_zone.outside.id
+    security_zone_id= fmc_security_zone.outside02.id
     if_name = "outside02"
     description = "Applied by terraform"
     mtu =  1500
@@ -273,7 +320,7 @@ resource "fmc_device_physical_interfaces" "physical_interfaces12" {
     device_id = fmc_devices.device02.id
     physical_interface_id= data.fmc_device_physical_interfaces.two_physical_interface_device02.id
     name =   data.fmc_device_physical_interfaces.two_physical_interface_device02.name
-    security_zone_id= fmc_security_zone.outside.id
+    security_zone_id= fmc_security_zone.inside.id
     if_name = "inside"
     description = "Applied by terraform"
     mtu =  1500
@@ -288,7 +335,7 @@ resource "fmc_staticIPv4_route" "route01" {
   depends_on = [fmc_devices.device01, fmc_device_physical_interfaces.physical_interfaces00,fmc_device_physical_interfaces.physical_interfaces01,fmc_device_physical_interfaces.physical_interfaces02]
   metric_value = 25
   device_id  = fmc_devices.device01.id
-  interface_name = "outside"
+  interface_name = "outside01"
   selected_networks {
       id = data.fmc_network_objects.any-ipv4.id
       type = data.fmc_network_objects.any-ipv4.type
@@ -308,7 +355,7 @@ resource "fmc_staticIPv4_route" "route02" {
   depends_on = [fmc_devices.device02,fmc_device_physical_interfaces.physical_interfaces10,fmc_device_physical_interfaces.physical_interfaces11,fmc_device_physical_interfaces.physical_interfaces12]
   metric_value = 25
   device_id  = fmc_devices.device02.id
-  interface_name = "outside"
+  interface_name = "outside01"
   selected_networks {
       id = data.fmc_network_objects.any-ipv4.id
       type = data.fmc_network_objects.any-ipv4.type
@@ -352,7 +399,7 @@ resource "fmc_policy_devices_assignments" "policy_assignment02" {
 
 resource "null_resource" "run_python_script" {
   provisioner "local-exec" {
-    command = "python3 ./testing.py"
+    command = "python3 ./testing.py --addr https://<> --username tfuser --password Cisco123"
   }
 
   depends_on = [fmc_policy_devices_assignments.policy_assignment01,fmc_policy_devices_assignments.policy_assignment02]
@@ -364,14 +411,14 @@ resource "null_resource" "run_python_script" {
 # Deploying the changes to the device
 ################################################################################################
 resource "fmc_ftd_deploy" "ftd01" {
-    depends_on = [fmc_policy_devices_assignments.policy_assignment01]
+    depends_on = [fmc_policy_devices_assignments.policy_assignment01, null_resource.run_python_script]
     device = fmc_devices.device01.id
     ignore_warning = true
     force_deploy = false
 }
 
 resource "fmc_ftd_deploy" "ftd02" {
-    depends_on = [fmc_policy_devices_assignments.policy_assignment02]
+    depends_on = [fmc_policy_devices_assignments.policy_assignment02,null_resource.run_python_script]
     device = fmc_devices.device02.id
     ignore_warning = true
     force_deploy = false

@@ -1,24 +1,17 @@
 #! /usr/bin/python3
 
+import argparse
 import json
-import os
 import time
 
 import fmcapi
 import requests
 
-addr=os.environ.get('ADDR')
-is_cdfmc = os.environ.get('IS_CDFMC')
-token = os.environ.get('ACCESS_TOKEN')
-domainUUID = os.environ.get('DOMAIN_UUID')
-username=os.environ.get('FMC_USERNAME')
-password=os.environ.get('FMC_PASSWORD')
 
-
-def main():
+def main(args):
     print("IN main-aws")
 
-    with fmcapi.FMC(host=addr, username=username, password=password, autodeploy=False) as fmc:
+    with fmcapi.FMC(host=args.addr, username=args.username, password=args.password, autodeploy=False) as fmc:
         namer = "extended_net_acl"
         ext_acl = fmcapi.ExtendedAccessList(fmc=fmc)
         ext_acl.name = namer
@@ -66,17 +59,17 @@ def main():
         print(acl['id'])
 
 
-def unknown():
-    host = addr
-    if is_cdfmc == "true":
+def unknown(args):
+    host = args.addr
+    if args.is_cdfmc == "true":
         headers = {
             'accept': 'application/json',
-            'Authorization': 'Bearer ' + token,
+            'Authorization': 'Bearer ' + args.token,
             'Content-Type': 'application/json'
         }
     else:
-        username = os.environ.get('FMC_USERNAME')
-        password = os.environ.get('FMC_PASSWORD')
+        username = args.username
+        password = args.password
         device_name = "FTD-1"
         print(host)
         print(username)
@@ -87,11 +80,10 @@ def unknown():
         domainurl = "https://"+host+"//api/fmc_platform/v1/auth/generatetoken"
         payload0={}
 
-        domainresponse = requests.request("POST", domainurl,data=payload0, auth=(username ,password), verify=False)
+        domainresponse = requests.request("POST", domainurl, data=payload0, auth=(username, password), verify=False)
 
         token1 = domainresponse.headers['X-auth-access-token']
         domainUUID = domainresponse.headers['DOMAIN_UUID']
-
 
         #####Defining Headers
 
@@ -101,14 +93,13 @@ def unknown():
             'Content-Type': 'application/json'
         }
 
-
     # Base url
 
     baseurl = "https://"+host+"/api/fmc_config/v1/domain/"+domainUUID+"/devices/devicerecords"
 
     #####Device ID-1
     deviceurl1 = baseurl+"?filter=name:"+device_name
-    devicepayload1={}
+    devicepayload1 = {}
     deviceresponse1 = requests.request("GET", deviceurl1, headers=headers, data=devicepayload1, verify=False)
     json_data1 = json.loads(deviceresponse1.text)
     deviceID1 = json_data1["items"][0]["id"]
@@ -118,7 +109,7 @@ def unknown():
 
     #####Physical Interface ID
     phyurl = baseurl + "/" + deviceID1 + "/physicalinterfaces?offset=1&limit=25"
-    phypayload={}
+    phypayload = {}
     phyresponse = requests.request("GET", phyurl, headers=headers, data=phypayload, verify=False)
     json_phyinter = json.loads(phyresponse.text)
     phyID1 = json_phyinter["items"][0]["id"]
@@ -130,7 +121,7 @@ def unknown():
     print(phyID3)
 
     #####PBR
-    pbrurl = baseurl + "/" + deviceID1 + "/policybasedroutes" ## CHANGE TO PBR
+    pbrurl = baseurl + "/" + deviceID1 + "/policybasedroutes"  # CHANGE TO PBR
     payload = json.dumps({
         "ingressInterfaces": [
             {
@@ -165,7 +156,7 @@ def unknown():
 
     # GET_Deployable devices
     getdeviceurl = "https://"+host+"/api/fmc_config/v1/domain/"+domainUUID+"/deployment/deployabledevices"
-    getdevicepayload={}
+    getdevicepayload = {}
     getdeviceresponse = requests.request("GET", getdeviceurl, headers=headers, data=getdevicepayload, verify=False)
     print(getdeviceresponse.text)
     print("Version---")
@@ -173,26 +164,22 @@ def unknown():
     version = json_version["items"][0]["version"]
     print(version)
 
-
-
     ##############
     ### REMOVE THIS EXIT() HERE TO DEPLOY
     ##############
-
-
 
     exit()
     # Deploying Devices
     deployurl = "https://"+host+"/api/fmc_config/v1/domain/"+domainUUID+"/deployment/deploymentrequests"
     deploypayload = json.dumps({
-      "type": "DeploymentRequest",
-      "version": version,
-      "forceDeploy": False,
-      "ignoreWarning": True,
-      "deviceList": [
-        deviceID1
-      ],
-      "deploymentNote": "--Deployed using RestAPI--"
+        "type": "DeploymentRequest",
+        "version": version,
+        "forceDeploy": False,
+        "ignoreWarning": True,
+        "deviceList": [
+            deviceID1
+        ],
+        "deploymentNote": "--Deployed using RestAPI--"
     })
 
     deployresponse = requests.request("POST", deployurl, headers=headers, data=deploypayload, verify=False)
@@ -200,5 +187,15 @@ def unknown():
 
 
 if __name__ == "__main__":
-    main()
-    unknown()
+    parser = argparse.ArgumentParser(description='Process some inputs.')
+    parser.add_argument('--addr', type=str, required=True, help='FMC host address')
+    parser.add_argument('--username', type=str, required=True, help='FMC username')
+    parser.add_argument('--password', type=str, required=True, help='FMC password')
+    parser.add_argument('--is_cdfmc', type=str, help='Is CDFMC?')
+    parser.add_argument('--token', type=str, help='Access Token')
+    parser.add_argument('--domainUUID', type=str, help='Domain UUID')
+
+    args = parser.parse_args()
+
+    main(args)
+    unknown(args)
