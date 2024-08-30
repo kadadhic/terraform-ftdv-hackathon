@@ -11,6 +11,7 @@ variable "aws_secret_key" {
 }
 variable "prefix" {
   type        = string
+  default = "Fireglass"
 }
 variable "region" {
   type        = string
@@ -133,7 +134,7 @@ variable "outside_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["152.0.0.0/8","172.0.0.0/8"]
+    cidr_blocks = ["0.0.0.0/0","172.0.0.0/8"]
     description = "Outside Interface SG"
   }]
 }
@@ -151,7 +152,7 @@ variable "inside_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["152.0.0.0/8","172.0.0.0/8"]
+    cidr_blocks = ["0.0.0.0/","172.0.0.0/8"]
     description = "Inside Interface SG"
   }]
 }
@@ -169,7 +170,7 @@ variable "mgmt_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["152.0.0.0/8","172.0.0.0/8"]
+    cidr_blocks = ["0.0.0.0/0","172.0.0.0/8"]
     description = "Mgmt Interface SG"
   }]
 }
@@ -187,7 +188,7 @@ variable "fmc_mgmt_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["152.0.0.0/8","172.0.0.0/8"]
+    cidr_blocks = ["0.0.0.0/0","172.0.0.0/8"]
     description = "FMC Mgmt Interface SG"
   }]
 }
@@ -211,7 +212,7 @@ variable "ftd_size" {
 variable "keyname" {
   type        = string
   description = "key to be used for the instances"
-  default = "fireglass-key-nvirginia"
+  default = "fireglass-key"
 }
 
 variable "use_ftd_eip" {
@@ -242,17 +243,17 @@ variable "listener_ports" {
   }]
 }
 
-variable "health_check" {
-  description = "port on target instance that will be used to check health status."
-  type = object({
-    protocol = string
-    port     = number
-  })
-  default = {
-    protocol = "TCP"
-    port     = 22
-  }
-}
+# variable "health_check" {
+#   description = "port on target instance that will be used to check health status."
+#   type = object({
+#     protocol = string
+#     port     = number
+#   })
+#   default = {
+#     protocol = "TCP"
+#     port     = 22
+#   }
+# }
 
 variable "reg_key" {
   type = string

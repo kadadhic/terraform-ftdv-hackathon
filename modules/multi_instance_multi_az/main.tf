@@ -22,12 +22,12 @@ module "service_network" {
   fmc_mgmt_interface_sg = var.fmc_mgmt_interface_sg
   use_fmc_eip           = var.use_fmc_eip
   use_ftd_eip           = var.use_ftd_eip
-  prefix = var.prefix
+  prefix                = var.prefix
 }
 
 module "instance" {
   source                  = "./modules/firewall_instance"
-  keyname                 = var.keyname
+  keyname                 = "${var.prefix}-${var.keyname}"
   ftd_size                = var.ftd_size
   instances_per_az        = var.instances_per_az
   availability_zone_count = var.availability_zone_count
@@ -40,7 +40,7 @@ module "instance" {
   reg_key                 = var.reg_key
   fmc_nat_id              = var.fmc_nat_id 
   create_fmc              = var.create_fmc
-  prefix = var.prefix
+  prefix                  = var.prefix
 }
 
 #########################################################################################################
@@ -64,8 +64,8 @@ resource "aws_lb_target_group" "front_end1_1" {
 
   health_check {
     interval = 30
-    protocol = var.health_check.protocol
-    port     = var.health_check.port
+    protocol = "TCP"
+    port     = 22
   }
 }
 
@@ -219,7 +219,7 @@ resource "aws_instance" "EC2-Ubuntu" {
   depends_on = [ module.service_network,module.service_network ]
   ami           = "ami-0e86e20dae9224db8" 
   instance_type = "t2.micro"
-  key_name      = var.keyname
+  key_name      = "${var.prefix}-${var.keyname}"//var.keyname
   
   # user_data = data.template_file.apache_install.rendered
   network_interface {
