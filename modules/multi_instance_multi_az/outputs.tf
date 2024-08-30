@@ -1,4 +1,7 @@
-# output "instance_ip" {
-#   description = "Public IP address of the FTD instances"
-#   value       = module.instance.instance_private_ip
-# }
+output "FMC_URL" {
+  value = module.service_network.FMC_URL
+}
+output "SSH_Command_FTD" {
+  value = "ssh -i ${var.prefix}-${var.keyname} admin@${module.service_network.aws_ftd_eip}"
+}
+

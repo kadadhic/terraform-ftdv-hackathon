@@ -104,3 +104,6 @@ output "mgmt_rt_id" {
 output "aws_ftd_eip" {
   value = aws_eip.ftd_mgmt_eip.*.public_ip
 }
+output "FMC_URL" {
+  value = "https://${aws_eip.fmcmgmt_eip[0].public_ip}"
+}
