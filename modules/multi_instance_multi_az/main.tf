@@ -112,7 +112,7 @@ data "aws_security_group" "sg"{
   depends_on = [module.service_network]
   filter {
     name   = "tag:Name"
-    values = ["Outside-InterfaceSG"]
+    values = ["${var.prefix}-Outside-InterfaceSG"]
   }
 }
 
