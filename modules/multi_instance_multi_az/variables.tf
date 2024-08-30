@@ -152,7 +152,7 @@ variable "inside_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["0.0.0.0/","172.0.0.0/8"]
+    cidr_blocks = ["0.0.0.0/0","172.0.0.0/8"]
     description = "Inside Interface SG"
   }]
 }
