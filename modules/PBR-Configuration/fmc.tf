@@ -15,45 +15,45 @@ provider "fmc" {
 }
 
 
-# resource "fmc_smart_license" "registration" {
-#   registration_type = "EVALUATION"
-# }
+resource "fmc_smart_license" "registration" {
+  registration_type = "EVALUATION"
+}
 # ################################################################################################
 # # Data blocks
 # ################################################################################################
 data "fmc_network_objects" "any-ipv4"{
-    # depends_on = [ fmc_smart_license.registration ]
+    depends_on = [ fmc_smart_license.registration ]
     name = "any-ipv4"
 }
 #1st device
 data "fmc_device_physical_interfaces" "zero_physical_interface_device01" {
-    # depends_on = [ fmc_smart_license.registration ]
+    depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device01.id
     name = "TenGigabitEthernet0/0"
 }
 data "fmc_device_physical_interfaces" "one_physical_interface_device01" {
-    # depends_on = [ fmc_smart_license.registration ]
+    depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device01.id
     name = "TenGigabitEthernet0/1"
 }
 data "fmc_device_physical_interfaces" "two_physical_interface_device01" {
-    # depends_on = [ fmc_smart_license.registration ]
+    depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device01.id
     name = "TenGigabitEthernet0/2"
 }
 #2nd device
 data "fmc_device_physical_interfaces" "zero_physical_interface_device02" {
-    # depends_on = [ fmc_smart_license.registration ]
+    depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device02.id
     name = "TenGigabitEthernet0/0"
 }
 data "fmc_device_physical_interfaces" "one_physical_interface_device02" {
-    # depends_on = [ fmc_smart_license.registration ]
+    depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device02.id
     name = "TenGigabitEthernet0/1"
 }
 data "fmc_device_physical_interfaces" "two_physical_interface_device02" {
-    # depends_on = [ fmc_smart_license.registration ]
+    depends_on = [ fmc_smart_license.registration ]
     device_id = fmc_devices.device02.id
     name = "TenGigabitEthernet0/2"
 }
@@ -61,17 +61,17 @@ data "fmc_device_physical_interfaces" "two_physical_interface_device02" {
 # Security Zones
 ################################################################################################
 resource "fmc_security_zone" "inside" {
-  # depends_on = [ fmc_smart_license.registration ]
+  depends_on = [ fmc_smart_license.registration ]
   name            = "InZone"
   interface_mode  = "ROUTED"
 }
 resource "fmc_security_zone" "outside01" {
-  # depends_on = [ fmc_smart_license.registration ]
+  depends_on = [ fmc_smart_license.registration ]
   name            = "OutZone01"
   interface_mode  = "ROUTED"
 }
 resource "fmc_security_zone" "outside02" {
-  # depends_on = [ fmc_smart_license.registration ]
+  depends_on = [ fmc_smart_license.registration ]
   name            = "OutZone02"
   interface_mode  = "ROUTED"
 }
