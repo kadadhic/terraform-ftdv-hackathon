@@ -51,7 +51,7 @@ resource "aws_instance" "ftdv" {
 resource "aws_instance" "fmcv" {
   count         = var.create_fmc ? 1 : 0
   ami           = data.aws_ami.fmcv[0].id
-  instance_type = "c5a.2xlarge"
+  instance_type = "c5.4xlarge"
   key_name = var.keyname
   network_interface {
     network_interface_id = var.fmcmgmt_interface

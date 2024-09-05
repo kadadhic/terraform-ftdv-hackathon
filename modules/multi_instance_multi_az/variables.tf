@@ -261,10 +261,10 @@ variable "reg_key" {
   default = "cisco"
 }
 
-variable "fmc_nat_id" {
-  type        = string
-  description = "FMC Registration NAT ID"
-}
+# variable "fmc_nat_id" {
+#   type        = string
+#   description = "FMC Registration NAT ID"
+# }
 
 # variable "listener_ports" {
 #   default = {

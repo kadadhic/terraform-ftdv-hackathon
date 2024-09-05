@@ -54,10 +54,10 @@ variable "fmc_mgmt_ip" {
   type        = string
   default     = ""
 }
-variable "fmc_nat_id" {
-  description = "specified fmc nat id . "
-  type        = string
-}
+# variable "fmc_nat_id" {
+#   description = "specified fmc nat id . "
+#   type        = string
+# }
 variable "ftd_mgmt_interface" {
   description = "list out existing ENI IDs to be used for ftd management interface"
   type        = list(string)

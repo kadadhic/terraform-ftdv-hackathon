@@ -38,7 +38,6 @@ module "instance" {
   ftd_diag_interface      = module.service_network.diag_interface
   fmcmgmt_interface       = module.service_network.fmcmgmt_interface
   reg_key                 = var.reg_key
-  fmc_nat_id              = var.fmc_nat_id 
   create_fmc              = var.create_fmc
   prefix                  = var.prefix
 }
@@ -216,7 +215,7 @@ resource "aws_network_interface_sg_attachment" "ftd_app_attachment" {
 }
 
 resource "aws_instance" "EC2-Ubuntu" {
-  depends_on = [ module.service_network,module.service_network ]
+  depends_on = [ module.service_network,module.instance ]
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
   key_name      = "${var.prefix}-${var.keyname}"//var.keyname
@@ -246,4 +245,69 @@ data "aws_ami" "ubuntu" {
   }
 
   owners = ["099720109477"]
+}
+
+
+#########################################################################################################
+# Creation of Bastion subnet and Bastion VM 
+#########################################################################################################
+data "aws_internet_gateway" "int_gw" {
+   depends_on = [module.service_network, module.instance]
+  filter {
+    name   = "tag:Name"
+    values = ["${var.prefix}-Internet Gateway"]
+  }
+}
+
+resource "aws_subnet" "bastion_subnet" {
+  vpc_id                  = data.aws_vpc.fireglass-vpc.id
+  cidr_block              = "172.16.6.0/24"
+  availability_zone       = data.aws_availability_zones.available.names[0]
+  map_public_ip_on_launch = true
+
+  tags = merge({
+    Name = "${var.prefix}-bastion-Subnet"})
+}
+
+resource "aws_network_interface" "bastion_interface" {
+  description = "bastion-interface"
+  subnet_id   = aws_subnet.bastion_subnet.id
+  private_ips = ["172.16.6.10"]
+}
+
+resource "aws_network_interface_sg_attachment" "bastion_attachment" {
+  depends_on           = [aws_network_interface.bastion_interface]
+  security_group_id    = data.aws_security_group.sg.id //aws_security_group.allow_all.id
+  network_interface_id = aws_network_interface.bastion_interface.id
+}
+
+resource "aws_route_table" "bastion_route" {
+  vpc_id = data.aws_vpc.fireglass-vpc.id
+  tags = {
+    Name = "${var.prefix}-bastion network Routing table"}
+}
+
+resource "aws_route_table_association" "bastion_association" {
+  subnet_id      = aws_subnet.bastion_subnet.id
+  route_table_id = aws_route_table.bastion_route.id
+}
+
+resource "aws_route" "bastion_default_route" {
+  route_table_id         = aws_route_table.bastion_route.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = data.aws_internet_gateway.int_gw.id
+}
+
+resource "aws_instance" "testLinux" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+  key_name      = "${var.prefix}-${var.keyname}"
+  network_interface {
+    network_interface_id = aws_network_interface.bastion_interface.id
+    device_index         = 0
+  }
+
+  tags = {
+    Name = "${var.prefix}-bastion"
+  }
 }
