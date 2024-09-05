@@ -47,7 +47,7 @@ variable "availability_zone_count" {
 variable "ftd_size" {
   description = "specified server instance type ."
   type        = string
-  default     = "c5.4xlarge"
+  default     = "c5a.2xlarge"
 }
 variable "fmc_mgmt_ip" {
   description = "specified fmc management IPs . "
