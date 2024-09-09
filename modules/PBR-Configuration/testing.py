@@ -138,12 +138,12 @@ def unknown(args):
             "defaultInterface": True,
             "egressInterfaces": [
                 {
-                    ### Outside Interface ###
-                    "id": f"{phyID1}"
-                },
-                {
                     ### Outside2 Interface ###
                     "id": f"{phyID2}"
+                },
+                {
+                    ### Outside Interface ###
+                    "id": f"{phyID1}"
                 }
             ]}
         ]
