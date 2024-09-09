@@ -10,7 +10,7 @@
 #   default = ""
 # }
 variable "prefix" {
-  type        = string
+  type    = string
   default = "Fireglass"
 }
 variable "region" {
@@ -40,49 +40,49 @@ variable "service_create_igw" {
 variable "mgmt_subnet_cidr" {
   description = "List out management Subnet CIDR . "
   type        = list(string)
-  default     = ["172.16.1.0/24","172.16.11.0/24"]
+  default     = ["172.16.1.0/24", "172.16.11.0/24"]
 }
 
 variable "ftd_mgmt_ip" {
   description = "List out management IPs . "
   type        = list(string)
-  default     = ["172.16.1.10","172.16.11.10"]
+  default     = ["172.16.1.10", "172.16.11.10"]
 }
 
 variable "outside_subnet_cidr" {
   description = "List out outside Subnet CIDR . "
   type        = list(string)
-  default     = ["172.16.2.0/24","172.16.12.0/24"]
+  default     = ["172.16.2.0/24", "172.16.12.0/24"]
 }
 
 variable "ftd_outside_ip" {
   type        = list(string)
   description = "List outside IPs . "
-  default     = ["172.16.2.10","172.16.12.10"]
+  default     = ["172.16.2.10", "172.16.12.10"]
 }
 
 variable "diag_subnet_cidr" {
   description = "List out diagonastic Subnet CIDR . "
   type        = list(string)
-  default     = ["172.16.4.0/24","172.16.14.0/24"]
+  default     = ["172.16.4.0/24", "172.16.14.0/24"]
 }
 
 variable "ftd_diag_ip" {
   type        = list(string)
   description = "List out FTD Diagonostic IPs . "
-  default     = ["172.16.4.10","172.16.14.10"]
+  default     = ["172.16.4.10", "172.16.14.10"]
 }
 
 variable "inside_subnet_cidr" {
   description = "List out inside Subnet CIDR . "
   type        = list(string)
-  default     = ["172.16.3.0/24","172.16.13.0/24"]
+  default     = ["172.16.3.0/24", "172.16.13.0/24"]
 }
 
 variable "ftd_inside_ip" {
   description = "List FTD inside IPs . "
   type        = list(string)
-  default     = ["172.16.3.10","172.16.13.10"]
+  default     = ["172.16.3.10", "172.16.13.10"]
 }
 
 variable "fmc_ip" {
@@ -100,25 +100,25 @@ variable "availability_zone_count" {
 variable "mgmt_subnet_name" {
   type        = list(string)
   description = "Specified management subnet names"
-  default     = ["mgmt_subnet-1","mgmt_subnet-2"]
+  default     = ["mgmt_subnet-1", "mgmt_subnet-2"]
 }
 
 variable "outside_subnet_name" {
   type        = list(string)
   description = "Specified outside subnet names"
-  default     = ["outside_subnet-1","outside_subnet-2"]
+  default     = ["outside_subnet-1", "outside_subnet-2"]
 }
 
 variable "diag_subnet_name" {
   description = "Specified diagonstic subnet names"
   type        = list(string)
-  default     = ["diag_subnet-1","diag_subnet-2"]
+  default     = ["diag_subnet-1", "diag_subnet-2"]
 }
 
 variable "inside_subnet_name" {
   type        = list(string)
   description = "Specified inside subnet names"
-  default     = ["inside_subnet-1","inside_subnet-2"]
+  default     = ["inside_subnet-1", "inside_subnet-2"]
 }
 
 variable "outside_interface_sg" {
@@ -134,7 +134,7 @@ variable "outside_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["128.107.84.92/32"]
+    cidr_blocks = ["0.0.0.0/0"]
     description = "Outside Interface SG"
   }]
 }
@@ -152,7 +152,7 @@ variable "inside_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["128.107.84.92/32"]
+    cidr_blocks = ["0.0.0.0/0"]
     description = "Inside Interface SG"
   }]
 }
@@ -170,7 +170,7 @@ variable "mgmt_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["128.107.84.92/32"]
+    cidr_blocks = ["0.0.0.0/0"]
     description = "Mgmt Interface SG"
   }]
 }
@@ -188,7 +188,7 @@ variable "fmc_mgmt_interface_sg" {
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
-    cidr_blocks = ["128.107.84.92/32"]
+    cidr_blocks = ["0.0.0.0/0"]
     description = "FMC Mgmt Interface SG"
   }]
 }
@@ -212,7 +212,7 @@ variable "ftd_size" {
 variable "keyname" {
   type        = string
   description = "key to be used for the instances"
-  default = "fireglass-key"
+  default     = "fireglass-key"
 }
 
 variable "use_ftd_eip" {
@@ -256,9 +256,9 @@ variable "listener_ports" {
 # }
 
 variable "reg_key" {
-  type = string
+  type        = string
   description = "FTD registration key"
-  default = "cisco"
+  default     = "cisco"
 }
 
 # variable "fmc_nat_id" {
