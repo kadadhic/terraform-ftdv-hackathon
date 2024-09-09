@@ -203,8 +203,8 @@ resource "fmc_ftd_autonat_rules" "nat_rule02" {
         type = "SecurityZone"//fmc_security_zone.outside02.type
     }
     original_network {
-        id = fmc_network_objects.corporate-lan01.id
-        type = fmc_network_objects.corporate-lan01.type
+        id = fmc_network_objects.corporate-lan02.id
+        type = fmc_network_objects.corporate-lan02.type
     }
     # translated_network {
     #     id = data.fmc_network_objects.public.id
