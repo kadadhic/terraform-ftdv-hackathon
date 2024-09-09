@@ -18,7 +18,7 @@ def main(args):
         ext_acl.entries = []
 
         ace = fmcapi.ExtendedAccessListAce()
-        ace.action = "ALLOW"
+        ace.action = "PERMIT"
         ace.destinationNetworksLiterals = [
             {
                 "type": "Network",
