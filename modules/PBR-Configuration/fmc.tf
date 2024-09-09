@@ -195,6 +195,35 @@ resource "fmc_ftd_autonat_rules" "nat_rule01" {
     # ipv6 = true
 }
 
+resource "fmc_ftd_autonat_rules" "nat_rule11" {
+    nat_policy = fmc_ftd_nat_policies.nat_policy01.id
+    description = "Created using terraform"
+    nat_type = "static"
+    source_interface {
+        id = fmc_security_zone.inside.id
+        type = "SecurityZone"//fmc_security_zone.inside.type
+    }
+    destination_interface {
+        id = fmc_security_zone.outside02.id
+        type = "SecurityZone"//fmc_security_zone.outside01.type
+    }
+    original_network {
+        id = fmc_network_objects.corporate-lan01.id
+        type = fmc_network_objects.corporate-lan01.type
+    }
+    # translated_network {
+    #     id = data.fmc_network_objects.public.id
+    #     type = data.fmc_network_objects.public.type
+    # }
+    translated_network_is_destination_interface = true
+    # original_port {
+    #     port = 53
+    #     protocol = "udp"
+    # }
+    # translated_port = 5353
+    # ipv6 = true
+}
+
 resource "fmc_ftd_autonat_rules" "nat_rule02" {
     nat_policy = fmc_ftd_nat_policies.nat_policy02.id
     description = "Created using terraform"
@@ -351,6 +380,25 @@ resource "fmc_staticIPv4_route" "route01" {
       id   = fmc_host_objects.outside01-gw.id
       type = fmc_host_objects.outside01-gw.type
       name = fmc_host_objects.outside01-gw.name
+    }
+  }
+}
+
+resource "fmc_staticIPv4_route" "route11" {
+  depends_on = [fmc_devices.device01, fmc_device_physical_interfaces.physical_interfaces00,fmc_device_physical_interfaces.physical_interfaces01,fmc_device_physical_interfaces.physical_interfaces02]
+  metric_value = 30
+  device_id  = fmc_devices.device01.id
+  interface_name = "outside02"
+  selected_networks {
+      id = data.fmc_network_objects.any-ipv4.id
+      type = data.fmc_network_objects.any-ipv4.type
+      name = data.fmc_network_objects.any-ipv4.name
+  }
+  gateway {
+    object {
+      id   = fmc_host_objects.outside02-gw.id
+      type = fmc_host_objects.outside02-gw.type
+      name = fmc_host_objects.outside02-gw.name
     }
   }
 }

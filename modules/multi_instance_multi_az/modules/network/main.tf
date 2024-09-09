@@ -334,7 +334,7 @@ resource "aws_route_table" "ftd_inside_route" {
   vpc_id = local.con
     route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_network_interface.ftd_inside.id
+    gateway_id = aws_network_interface.ftd_inside[count.index].id
   }
   tags = merge({
     Name = "${var.prefix}-inside network Routing table"
@@ -346,7 +346,7 @@ resource "aws_route_table" "ftd_diag_route" {
   vpc_id = local.con
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_network_interface.ftd_diag.id
+    gateway_id = aws_network_interface.ftd_diag[count.index].id
   }
   tags = merge({
     Name = "${var.prefix}-diag network Routing table"

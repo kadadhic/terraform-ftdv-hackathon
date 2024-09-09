@@ -1,14 +1,14 @@
-variable "aws_access_key" {
-  type        = string
-  description = "AWS ACCESS KEY"
-  default = ""
-}
+# variable "aws_access_key" {
+#   type        = string
+#   description = "AWS ACCESS KEY"
+#   default = ""
+# }
 
-variable "aws_secret_key" {
-  type        = string
-  description = "AWS SECRET KEY"
-  default = ""
-}
+# variable "aws_secret_key" {
+#   type        = string
+#   description = "AWS SECRET KEY"
+#   default = ""
+# }
 variable "prefix" {
   type        = string
   default = "Fireglass"
