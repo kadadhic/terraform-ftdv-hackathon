@@ -206,7 +206,7 @@ variable "instances_per_az" {
 variable "ftd_size" {
   type        = string
   description = "FTD Instance Size"
-  default     = "c5a.2xlarge"
+  default     = "c5a.4xlarge"
 }
 
 variable "keyname" {

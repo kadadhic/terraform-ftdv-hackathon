@@ -35,6 +35,7 @@ module "instance" {
   ftd_mgmt_interface      = module.service_network.mgmt_interface
   ftd_inside_interface    = module.service_network.inside_interface
   ftd_outside_interface   = module.service_network.outside_interface
+  ftd_outside2_interface  = aws_network_interface.ftd_public.*.id
   ftd_diag_interface      = module.service_network.diag_interface
   fmcmgmt_interface       = module.service_network.fmcmgmt_interface
   reg_key                 = var.reg_key
