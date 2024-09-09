@@ -156,13 +156,18 @@ resource "fmc_access_rules" "access_rule" {
 ################################################################################################
 # Nat Policy
 ################################################################################################
-resource "fmc_ftd_nat_policies" "nat_policy" {
-    name = "NAT_Policy"
+resource "fmc_ftd_nat_policies" "nat_policy01" {
+    name = "NAT_Policy01"
+    description = "Nat policy by terraform"
+}
+
+resource "fmc_ftd_nat_policies" "nat_policy02" {
+    name = "NAT_Policy02"
     description = "Nat policy by terraform"
 }
 
 resource "fmc_ftd_autonat_rules" "nat_rule01" {
-    nat_policy = fmc_ftd_nat_policies.nat_policy.id
+    nat_policy = fmc_ftd_nat_policies.nat_policy01.id
     description = "Created using terraform"
     nat_type = "static"
     source_interface {
@@ -191,7 +196,7 @@ resource "fmc_ftd_autonat_rules" "nat_rule01" {
 }
 
 resource "fmc_ftd_autonat_rules" "nat_rule02" {
-    nat_policy = fmc_ftd_nat_policies.nat_policy.id
+    nat_policy = fmc_ftd_nat_policies.nat_policy02.id
     description = "Created using terraform"
     nat_type = "static"
     source_interface {
@@ -376,8 +381,8 @@ resource "fmc_staticIPv4_route" "route02" {
 resource "fmc_policy_devices_assignments" "policy_assignment01" {
   depends_on = [fmc_staticIPv4_route.route01]
   policy {
-      id = fmc_ftd_nat_policies.nat_policy.id
-      type = fmc_ftd_nat_policies.nat_policy.type
+      id = fmc_ftd_nat_policies.nat_policy01.id
+      type = fmc_ftd_nat_policies.nat_policy01.type
   }
   target_devices {
       id = fmc_devices.device01.id
@@ -388,8 +393,8 @@ resource "fmc_policy_devices_assignments" "policy_assignment01" {
 resource "fmc_policy_devices_assignments" "policy_assignment02" {
   depends_on = [fmc_staticIPv4_route.route02]
   policy {
-      id = fmc_ftd_nat_policies.nat_policy.id
-      type = fmc_ftd_nat_policies.nat_policy.type
+      id = fmc_ftd_nat_policies.nat_policy02.id
+      type = fmc_ftd_nat_policies.nat_policy02.type
   }
   target_devices {
       id = fmc_devices.device02.id
@@ -408,7 +413,7 @@ resource "null_resource" "install_fmcapi" {
 
 resource "null_resource" "run_python_script" {
   provisioner "local-exec" {
-    command = "python3 ./testing.py --addr ${var.fmc_host} --username ${var.fmc_username} --password ${var.fmc_password}"
+    command = "python3  ${path.module}/testing.py --addr ${var.fmc_host} --username ${var.fmc_username} --password ${var.fmc_password}"
   }
 
   depends_on = [fmc_policy_devices_assignments.policy_assignment01,fmc_policy_devices_assignments.policy_assignment02,null_resource.install_fmcapi]
