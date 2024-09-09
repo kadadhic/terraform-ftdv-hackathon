@@ -227,7 +227,7 @@ resource "fmc_ftd_autonat_rules" "nat_rule02" {
 # FTDv Onboarding
 ################################################################################################
 resource "fmc_devices" "device01"{
-  depends_on = [fmc_access_policies.access_policy,fmc_ftd_nat_policies.nat_policy, fmc_security_zone.inside, fmc_security_zone.outside01,fmc_security_zone.outside02]
+  depends_on = [fmc_access_policies.access_policy,fmc_ftd_nat_policies.nat_policy01, fmc_security_zone.inside, fmc_security_zone.outside01,fmc_security_zone.outside02]
   name = "NGFW01"
   hostname = "172.16.1.10"
   regkey = "cisco"
@@ -239,7 +239,7 @@ resource "fmc_devices" "device01"{
 }
 
 resource "fmc_devices" "device02"{
-  depends_on = [fmc_devices.device01 ,fmc_access_policies.access_policy,fmc_ftd_nat_policies.nat_policy, fmc_security_zone.inside, fmc_security_zone.outside02]
+  depends_on = [fmc_devices.device01 ,fmc_access_policies.access_policy,fmc_ftd_nat_policies.nat_policy02, fmc_security_zone.inside, fmc_security_zone.outside02]
   name = "NGFW02"
   hostname = "172.16.11.10"
   regkey = "cisco"
