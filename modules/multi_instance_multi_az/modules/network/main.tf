@@ -10,7 +10,7 @@ resource "aws_vpc" "ftd_vpc" {
   enable_dns_support   = true
   enable_dns_hostnames = true
   #enable_classiclink   = false
-  instance_tenancy     = "default"
+  instance_tenancy = "default"
   tags = merge({
     Name = "${var.prefix}-${var.vpc_name}"
   }, var.tags)
@@ -68,7 +68,7 @@ resource "aws_security_group" "outside_sg" {
   name        = "${var.prefix}-Outside-InterfaceSG"
   vpc_id      = local.con
   description = "Secure Firewall OutsideSG"
-   tags = {
+  tags = {
     Name = "${var.prefix}-Outside-InterfaceSG"
   }
 }
@@ -101,7 +101,7 @@ resource "aws_security_group" "inside_sg" {
   name        = "${var.prefix}-Inside InterfaceSG"
   vpc_id      = local.con
   description = "Secure Firewall InsideSG"
-   tags = {
+  tags = {
     Name = "${var.prefix}-Inside-InterfaceSG"
   }
 }
@@ -283,7 +283,7 @@ resource "aws_network_interface" "ftd_diag" {
 
 #Static FMC IP
 resource "aws_network_interface" "fmcmgmt" {
-  count             = "1"//var.create_fmc ? (length(var.fmc_interface) != 0 ? 0 : 1) : 0
+  count             = "1" //var.create_fmc ? (length(var.fmc_interface) != 0 ? 0 : 1) : 0
   description       = "Fmc_Management"
   subnet_id         = local.mgmt_subnet[local.azs[0] - 1].id
   source_dest_check = false
@@ -320,7 +320,7 @@ resource "aws_route_table" "ftd_mgmt_route" {
 resource "aws_route_table" "ftd_outside_route" {
   count  = length(local.outside_subnet)
   vpc_id = local.con
-   route {
+  route {
     cidr_block = "0.0.0.0/0"
     gateway_id = local.igw
   }
@@ -332,9 +332,9 @@ resource "aws_route_table" "ftd_outside_route" {
 resource "aws_route_table" "ftd_inside_route" {
   count  = length(local.inside_subnet)
   vpc_id = local.con
-    route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_network_interface.ftd_inside[count.index].id
+  route {
+    cidr_block           = "0.0.0.0/0"
+    network_interface_id = aws_network_interface.ftd_inside[count.index].id
   }
   tags = merge({
     Name = "${var.prefix}-inside network Routing table"
@@ -345,8 +345,8 @@ resource "aws_route_table" "ftd_diag_route" {
   count  = length(local.diag_subnet)
   vpc_id = local.con
   route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_network_interface.ftd_diag[count.index].id
+    cidr_block           = "0.0.0.0/0"
+    network_interface_id = aws_network_interface.ftd_diag[count.index].id
   }
   tags = merge({
     Name = "${var.prefix}-diag network Routing table"
@@ -382,7 +382,7 @@ resource "aws_route_table_association" "diag_association" {
 # # ##################################################################################################################################
 
 resource "aws_eip" "ftd_mgmt_eip" {
-  count = 2//var.use_ftd_eip ? length(var.mgmt_subnet_name) : 0
+  count = 2 //var.use_ftd_eip ? length(var.mgmt_subnet_name) : 0
   tags = merge({
     "Name" = "fireglass-ftd-${count.index} Management IP"
   }, var.tags)
