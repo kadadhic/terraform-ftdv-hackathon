@@ -18,36 +18,36 @@ def main(args):
         ext_acl.entries = []
 
         ace = fmcapi.ExtendedAccessListAce()
-        ace.action = "DENY"
+        ace.action = "ALLOW"
         ace.destinationNetworksLiterals = [
             {
                 "type": "Network",
-                "value": "10.0.10.0/24"
+                "value": "0.0.0.0/0"
             }
         ]
 
         ace.sourceNetworksLiterals = [
             {
                 "type": "Network",
-                "value": "10.0.10.0/24"
+                "value": "172.16.3.0/24"
             }
         ]
 
-        ace.destinationPortsLiterals = [
-            {
-                "type": "PortLiteral",
-                "port": "443",
-                "protocol": "6"  # CHANGE TO TCP(6) or UDP(17)
-            }
-        ]
+        # ace.destinationPortsLiterals = [
+        #     {
+        #         "type": "PortLiteral",
+        #         "port": "443",
+        #         "protocol": "6"  # CHANGE TO TCP(6) or UDP(17)
+        #     }
+        # ]
 
-        ace.sourcePortsLiterals = [
-            {
-                "type": "PortLiteral",
-                "port": "80",
-                "protocol": "6"
-            }
-        ]
+        # ace.sourcePortsLiterals = [
+        #     {
+        #         "type": "PortLiteral",
+        #         "port": "80",
+        #         "protocol": "6"
+        #     }
+        # ]
 
         ext_acl.entries.append(ace.build_ace())
         print("------------- Post Extended Access List ---------------")
