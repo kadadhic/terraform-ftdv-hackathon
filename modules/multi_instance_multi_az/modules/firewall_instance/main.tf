@@ -39,8 +39,12 @@ resource "aws_instance" "ftdv" {
     device_index         = 2
   }
   network_interface {
-    network_interface_id = element(var.ftd_inside_interface, count.index)
+    network_interface_id = element(var.ftd_outside2_interface, count.index)
     device_index         = 3
+  }
+  network_interface {
+    network_interface_id = element(var.ftd_inside_interface, count.index)
+    device_index         = 4
   }
   user_data = data.template_file.ftd_startup_file[count.index].rendered
   tags = merge({

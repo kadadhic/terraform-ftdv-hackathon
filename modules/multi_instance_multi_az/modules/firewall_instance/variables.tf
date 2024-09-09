@@ -73,6 +73,11 @@ variable "ftd_outside_interface" {
   type        = list(string)
   default     = ["172.16.2.10","172.16.12.10"]
 }
+variable "ftd_outside2_interface" {
+  description = "list out existing ENI IDs to be used for outside interface"
+  type        = list(string)
+  default     = ["172.16.5.10","172.16.15.10"]
+}
 variable "ftd_diag_interface" {
   description = "list out existing ENI IDs to be used for digonstic interface"
   type        = list(string)
