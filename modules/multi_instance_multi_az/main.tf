@@ -154,6 +154,10 @@ resource "aws_network_interface" "ftd_public" {
 resource "aws_route_table" "ftd_public_route" {
   count  = 2 //length(local.outside_subnet)
   vpc_id = data.aws_vpc.fireglass-vpc.id//local.con
+   route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = data.aws_internet_gateway.int_gw.id
+  }
   tags = {
     Name = "${var.prefix}-public network Routing table"
   }

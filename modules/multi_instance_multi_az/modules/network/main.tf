@@ -320,6 +320,10 @@ resource "aws_route_table" "ftd_mgmt_route" {
 resource "aws_route_table" "ftd_outside_route" {
   count  = length(local.outside_subnet)
   vpc_id = local.con
+   route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = local.igw
+  }
   tags = merge({
     Name = "${var.prefix}-outside network Routing table"
   }, var.tags)
@@ -328,6 +332,10 @@ resource "aws_route_table" "ftd_outside_route" {
 resource "aws_route_table" "ftd_inside_route" {
   count  = length(local.inside_subnet)
   vpc_id = local.con
+    route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_network_interface.ftd_inside.id
+  }
   tags = merge({
     Name = "${var.prefix}-inside network Routing table"
   }, var.tags)
@@ -336,6 +344,10 @@ resource "aws_route_table" "ftd_inside_route" {
 resource "aws_route_table" "ftd_diag_route" {
   count  = length(local.diag_subnet)
   vpc_id = local.con
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_network_interface.ftd_diag.id
+  }
   tags = merge({
     Name = "${var.prefix}-diag network Routing table"
   }, var.tags)
