@@ -316,3 +316,20 @@ resource "aws_instance" "testLinux" {
     Name = "${var.prefix}-bastion"
   }
 }
+
+#########################################################################################################
+resource "null_resource" "wait" {
+  depends_on = [ module.instance,module.service_network ]
+  provisioner "local-exec" {
+    command = "sleep 1800"
+  }
+}
+
+
+module "pbr_configuration" {
+  source                = "./modules/pbr_configuration"
+   depends_on = [ module.instance,module.service_network, resource.null_resource.wait ]
+  fmc_host = module.service_network.FMC_public_ip//var.fmc_host
+  fmc_username = var.fmc_username
+  fmc_password = var.fmc_password
+}
