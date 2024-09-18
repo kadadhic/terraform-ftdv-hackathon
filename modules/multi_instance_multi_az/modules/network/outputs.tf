@@ -108,6 +108,6 @@ output "FMC_URL" {
   value = "https://${aws_eip.fmcmgmt_eip[0].public_ip}"
 }
 
-output "FMC_public_ip" {
-  value = aws_eip.fmcmgmt_eip[0].public_ip
+output "fmc_pub_ip" {
+  value= aws_eip.fmcmgmt_eip[0].public_ip
 }

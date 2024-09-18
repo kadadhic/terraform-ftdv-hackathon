@@ -8,7 +8,3 @@ output "FMC_URL" {
 output "Bastion_URL" {
   value = "ssh ubuntu@${aws_instance.testLinux.public_ip}"
 }
-
-# output "FMC_URL" {
-#   value = "https://${var.fmc_host}"
-# }

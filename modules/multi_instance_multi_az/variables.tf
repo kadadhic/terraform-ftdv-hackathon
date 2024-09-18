@@ -283,16 +283,3 @@ variable "reg_key" {
 variable "create_fmc" {
   default = true
 }
-
-# variable "fmc_host" {
-#     type = string
-#     default = "1.1.1.1"
-# }
-
-variable "fmc_username" {
-  default = ""
-}
-
-variable "fmc_password" {
-  default = ""
-}

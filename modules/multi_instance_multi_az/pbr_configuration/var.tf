@@ -4,9 +4,9 @@ variable "fmc_host" {
 }
 
 variable "fmc_username" {
-  default = ""
+  default = "admin"
 }
 
 variable "fmc_password" {
-  default = ""
+  default = "Cisco@123"
 }
