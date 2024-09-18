@@ -316,3 +316,24 @@ resource "aws_instance" "testLinux" {
     Name = "${var.prefix}-bastion"
   }
 }
+
+#######################################################################
+
+resource "time_sleep" "wait_30_min" {
+  depends_on      = [module.instance,module.service_network]
+  create_duration = "1800s"
+}
+resource "null_resource" "pbr" {
+  depends_on = [time_sleep.wait_30_min]
+
+  provisioner "local-exec" {
+    command     = "terraform init && terraform apply -auto-approve -var='fmc_host=${module.service_network.fmc_pub_ip}'"
+    working_dir = "${path.module}/pbr_configuration"
+  }
+
+  provisioner "local-exec" {
+    when        = destroy
+    command     = "rm terraform.tfstate*"
+    working_dir = "${path.module}/pbr_configuration"
+  }
+}
