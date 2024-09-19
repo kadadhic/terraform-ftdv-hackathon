@@ -319,12 +319,12 @@ resource "aws_instance" "testLinux" {
 
 #######################################################################
 
-resource "time_sleep" "wait_30_min" {
+resource "time_sleep" "wait_35_min" {
   depends_on      = [module.instance,module.service_network]
-  create_duration = "1800s"
+  create_duration = "2300s"
 }
 resource "null_resource" "pbr" {
-  depends_on = [time_sleep.wait_30_min]
+  depends_on = [time_sleep.wait_35_min]
 
   provisioner "local-exec" {
     command     = "terraform init && terraform apply -auto-approve -var='fmc_host=${module.service_network.fmc_pub_ip}'"
