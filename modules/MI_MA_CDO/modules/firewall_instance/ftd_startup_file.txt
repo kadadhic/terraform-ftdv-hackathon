@@ -5,4 +5,5 @@
       "ManageLocally":  "No",
       "FmcIp":          "${fmc_ip}",
       "FmcRegKey":      "${reg_key}",
+      "FmcNatId":       "${nat_id}",
 }

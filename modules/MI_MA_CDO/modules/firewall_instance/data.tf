@@ -22,10 +22,12 @@ data "aws_ami" "ftdv" {
 }
 
 data "template_file" "ftd_startup_file" {
+  count = 2
   template = file("${path.module}/ftd_startup_file.txt")
   vars = {
     fmc_ip     = var.fmc_host
-    reg_key    = var.reg_key
+    reg_key    = var.reg_key[count.index]
     ftd_admin_password = var.ftd_admin_password
+    nat_id = var.nat_id[count.index]
   }
 }

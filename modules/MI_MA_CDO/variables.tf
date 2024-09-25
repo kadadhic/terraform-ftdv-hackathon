@@ -256,9 +256,15 @@ variable "listener_ports" {
 # }
 
 variable "reg_key" {
-  type        = string
+  type        = list(string)
   description = "FTD registration key"
-  default     = "cisco"
+  default     = ["cisco", "cisco"]
+}
+
+variable "nat_id" {
+  type        = list(string)
+  description = "NAT ID of the FTD"
+  default = ["", ""]
 }
 variable "fmc_host" {
   type        = string
@@ -269,14 +275,12 @@ variable "cdo_token" {
   description = "CDO Token"
 }
 
-# variable "fmc_nat_id" {
-#   type        = string
-#   description = "FMC Registration NAT ID"
-# }
-
 variable "cdo_host" {
   type        = string
 }
 variable "cdo_region" {
   type        = string 
+}
+variable "cdo-https-host"{
+  type = string
 }

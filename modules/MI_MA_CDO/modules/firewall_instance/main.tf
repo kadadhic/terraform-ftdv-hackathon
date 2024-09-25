@@ -46,9 +46,13 @@ resource "aws_instance" "ftdv" {
     network_interface_id = element(var.ftd_inside_interface, count.index)
     device_index         = 4
   }
-  user_data = data.template_file.ftd_startup_file.rendered
+  user_data = data.template_file.ftd_startup_file[count.index].rendered
   tags = merge({
     Name = "${var.prefix}-Cisco ftdv${count.index}"
   }, var.tags)
 }
 
+resource "time_sleep" "wait_17_mins" {
+  depends_on      = [aws_instance.ftdv]
+  create_duration = "17m"
+}

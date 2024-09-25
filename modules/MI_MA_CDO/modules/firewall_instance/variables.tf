@@ -80,11 +80,21 @@ variable "block_encrypt" {
 }
 
 variable "reg_key" {
-  type        = string
+  type        = list(string)
   description = "FTD registration key"
-  default     = "cisco"
+  default     = ["cisco", "cisco"]
+}
+
+variable "nat_id" {
+  type        = list(string)
+  description = "NAT ID of the FTD"
+  default = ["", ""]
 }
 variable "fmc_host" {
   type        = string
   description = "FTD host IP"
+}
+
+variable "ftd_eip"{
+  type = list(string)
 }

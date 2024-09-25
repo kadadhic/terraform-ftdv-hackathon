@@ -70,7 +70,7 @@ def unknown(args):
     else:
         username = args.username
         password = args.password
-        device_name = "NGFW01"
+        device_name = "FTD1"
         print(host)
         print(username)
         print(password)

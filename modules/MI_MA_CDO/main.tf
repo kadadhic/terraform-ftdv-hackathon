@@ -22,6 +22,20 @@ module "service_network" {
   prefix                = var.prefix
 }
 
+resource "fmc_access_policies" "fmc_access_policy" {
+  depends_on = [ module.service_network ]
+  name           = "FireGlass-access-policy"
+  default_action = "PERMIT"
+}
+
+resource "cdo_ftd_device" "ftd" {
+  count              = var.availability_zone_count
+  name               = "FTD${count.index+1}"
+  licenses           = ["BASE"]
+  virtual            = true
+  performance_tier   = "FTDv50"
+  access_policy_name = fmc_access_policies.fmc_access_policy.name
+}
 module "instance" {
   source                  = "./modules/firewall_instance"
   keyname                 = "${var.prefix}-${var.keyname}"
@@ -34,8 +48,22 @@ module "instance" {
   ftd_outside2_interface  = aws_network_interface.ftd_public.*.id
   ftd_diag_interface      = module.service_network.diag_interface
   prefix                  = var.prefix
-  reg_key                 = var.reg_key
+  reg_key                 = cdo_ftd_device.ftd.*.reg_key
+  nat_id                  = cdo_ftd_device.ftd.*.nat_id
   fmc_host                = var.fmc_host
+  ftd_eip                 = module.service_network.aws_ftd_eip
+}
+resource "cdo_ftd_device_onboarding" "ftd1" {
+  ftd_uid    = cdo_ftd_device.ftd[0].id
+  depends_on = [module.instance]
+}
+resource "time_sleep" "wait_3_mins" {
+  depends_on      = [cdo_ftd_device_onboarding.ftd1]
+  create_duration = "3m"
+}
+resource "cdo_ftd_device_onboarding" "ftd2" {
+  ftd_uid    = cdo_ftd_device.ftd[1].id
+  depends_on = [time_sleep.wait_3_mins]
 }
 
 #########################################################################################################
@@ -314,12 +342,12 @@ resource "aws_instance" "testLinux" {
 
 #######################################################################
 
-resource "time_sleep" "wait_15_mins" {
-  depends_on      = [module.instance,module.service_network]
-  create_duration = "15m"
+resource "time_sleep" "wait_10_sec" {
+  depends_on      = [cdo_ftd_device_onboarding.ftd2]
+  create_duration = "10s"
 }
 resource "null_resource" "pbr" {
-  depends_on = [time_sleep.wait_15_mins]
+  depends_on = [time_sleep.wait_10_sec]
 
   provisioner "local-exec" {
     command     = "terraform init && terraform apply -auto-approve -var='fmc_host=${var.fmc_host}' -var='cdo_token=${var.cdo_token}' -var='cdo_host=${var.cdo_host}' -var='cdo_region=${var.cdo_region}' -var='ftd_ip1=${module.service_network.aws_ftd_eip[0]}' -var='ftd_ip2=${module.service_network.aws_ftd_eip[1]}' "
@@ -331,22 +359,4 @@ resource "null_resource" "pbr" {
     command     = "rm terraform.tfstate*"
     working_dir = "${path.module}/pbr_configuration"
   }
-}
-
-
-
-resource "tls_private_key" "key_pair" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-  
-resource "local_file" "private_key" {
-  content       = tls_private_key.key_pair.private_key_openssh
-  filename      = "${var.prefix}-${var.keyname}"
-  file_permission = 0700
-}
-  
-resource "aws_key_pair" "deployer" {
-  key_name   = "${var.prefix}-${var.keyname}"
-  public_key = tls_private_key.key_pair.public_key_openssh
 }
