@@ -15,10 +15,6 @@ provider "fmc" {
   fmc_insecure_skip_verify = true
 }
 
-
-# resource "fmc_smart_license" "registration" {
-#   registration_type = "EVALUATION"
-# }
 # ################################################################################################
 # # Data blocks
 # ################################################################################################
@@ -29,38 +25,31 @@ data "fmc_devices" "device02" {
     name = "FTD2"
 }
 data "fmc_network_objects" "any-ipv4" {
-  depends_on = [fmc_smart_license.registration]
   name       = "any-ipv4"
 }
 #1st device
 data "fmc_device_physical_interfaces" "zero_physical_interface_device01" {
-  depends_on = [fmc_smart_license.registration]
   device_id  = data.fmc_devices.device01.id
   name       = "TenGigabitEthernet0/0"
 }
 data "fmc_device_physical_interfaces" "one_physical_interface_device01" {
-  depends_on = [fmc_smart_license.registration]
   device_id  = data.fmc_devices.device01.id
   name       = "TenGigabitEthernet0/1"
 }
 data "fmc_device_physical_interfaces" "two_physical_interface_device01" {
-  depends_on = [fmc_smart_license.registration]
   device_id  = data.fmc_devices.device01.id
   name       = "TenGigabitEthernet0/2"
 }
 #2nd device
 data "fmc_device_physical_interfaces" "zero_physical_interface_device02" {
-  depends_on = [fmc_smart_license.registration]
   device_id  = data.fmc_devices.device02.id
   name       = "TenGigabitEthernet0/0"
 }
 data "fmc_device_physical_interfaces" "one_physical_interface_device02" {
-  depends_on = [fmc_smart_license.registration]
   device_id  = data.fmc_devices.device02.id
   name       = "TenGigabitEthernet0/1"
 }
 data "fmc_device_physical_interfaces" "two_physical_interface_device02" {
-  depends_on = [fmc_smart_license.registration]
   device_id  = data.fmc_devices.device02.id
   name       = "TenGigabitEthernet0/2"
 }
@@ -125,7 +114,7 @@ resource "fmc_host_objects" "outside02-gw" {
 # Access Policy
 ################################################################################################
 data "fmc_access_policies" "access_policy" {
-  name                              = "FireGlass-access-policy"
+  name = "FireGlass-access-policy"
 }
 
 resource "fmc_access_rules" "access_rule" {
@@ -342,7 +331,7 @@ resource "fmc_device_physical_interfaces" "physical_interfaces12" {
 # Adding static route
 ################################################################################################
 resource "fmc_staticIPv4_route" "route01" {
-  depends_on     = [fmc_devices.device01, fmc_device_physical_interfaces.physical_interfaces00, fmc_device_physical_interfaces.physical_interfaces01, fmc_device_physical_interfaces.physical_interfaces02]
+  depends_on     = [data.fmc_devices.device01, fmc_device_physical_interfaces.physical_interfaces00, fmc_device_physical_interfaces.physical_interfaces01, fmc_device_physical_interfaces.physical_interfaces02]
   metric_value   = 25
   device_id      = data.fmc_devices.device01.id
   interface_name = "outside01"
@@ -361,9 +350,9 @@ resource "fmc_staticIPv4_route" "route01" {
 }
 
 resource "fmc_staticIPv4_route" "route11" {
-  depends_on     = [fmc_devices.device01, fmc_device_physical_interfaces.physical_interfaces00, fmc_device_physical_interfaces.physical_interfaces01, fmc_device_physical_interfaces.physical_interfaces02]
+  depends_on     = [data.fmc_devices.device01, fmc_device_physical_interfaces.physical_interfaces00, fmc_device_physical_interfaces.physical_interfaces01, fmc_device_physical_interfaces.physical_interfaces02]
   metric_value   = 30
-  device_id      = fmc_devices.device01.id
+  device_id      = data.fmc_devices.device01.id
   interface_name = "outside02"
   selected_networks {
     id   = data.fmc_network_objects.any-ipv4.id
@@ -381,7 +370,7 @@ resource "fmc_staticIPv4_route" "route11" {
 
 //2nd device route 
 resource "fmc_staticIPv4_route" "route02" {
-  depends_on     = [fmc_devices.device02, fmc_device_physical_interfaces.physical_interfaces10, fmc_device_physical_interfaces.physical_interfaces11, fmc_device_physical_interfaces.physical_interfaces12]
+  depends_on     = [data.fmc_devices.device02, fmc_device_physical_interfaces.physical_interfaces10, fmc_device_physical_interfaces.physical_interfaces11, fmc_device_physical_interfaces.physical_interfaces12]
   metric_value   = 25
   device_id      = data.fmc_devices.device02.id
   interface_name = "outside01"
@@ -437,7 +426,7 @@ resource "null_resource" "install_fmcapi" {
 
 resource "null_resource" "run_python_script" {
   provisioner "local-exec" {
-    command = "python3  ${path.module}/testing.py --addr ${var.fmc_host} --username ${var.fmc_username} --password ${var.fmc_password}"
+    command = "python3  ${path.module}/fmc.py --host ${var.fmc_host} --token ${var.cdo_token}"
   }
 
   depends_on = [fmc_policy_devices_assignments.policy_assignment01, fmc_policy_devices_assignments.policy_assignment02, null_resource.install_fmcapi]

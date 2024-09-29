@@ -57,15 +57,14 @@ resource "cdo_ftd_device_onboarding" "ftd1" {
   ftd_uid    = cdo_ftd_device.ftd[0].id
   depends_on = [module.instance]
 }
-resource "time_sleep" "wait_3_mins" {
+resource "time_sleep" "wait_10_secs" {
   depends_on      = [cdo_ftd_device_onboarding.ftd1]
-  create_duration = "3m"
+  create_duration = "10s"
 }
 resource "cdo_ftd_device_onboarding" "ftd2" {
   ftd_uid    = cdo_ftd_device.ftd[1].id
-  depends_on = [time_sleep.wait_3_mins]
+  depends_on = [time_sleep.wait_10_secs]
 }
-
 #########################################################################################################
 # Creation of Network Load Balancer
 #########################################################################################################

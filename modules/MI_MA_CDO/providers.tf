@@ -6,7 +6,6 @@ terraform {
     }
     cdo = {
       source  = "CiscoDevnet/cdo"
-      version = ">=0.14.5"
     }
     fmc = {
       source  = "CiscoDevNet/fmc"

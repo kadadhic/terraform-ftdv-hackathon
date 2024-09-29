@@ -6,10 +6,6 @@ variable "fmc_host" {
 variable "fmc_username" {
   default = "admin"
 }
-variable "ftd_ip1" {
-}
-variable "ftd_ip2" {
-}
 variable "cdo_host" {
 }
 variable "cdo_region" { 
