@@ -415,21 +415,12 @@ resource "fmc_policy_devices_assignments" "policy_assignment02" {
   }
 }
 
-
-resource "null_resource" "install_fmcapi" {
-  provisioner "local-exec" {
-    command = "pip3 install fmcapi"
-  }
-
-  depends_on = [fmc_policy_devices_assignments.policy_assignment01, fmc_policy_devices_assignments.policy_assignment02]
-}
-
 resource "null_resource" "run_python_script" {
   provisioner "local-exec" {
     command = "python3  ${path.module}/fmc.py --host ${var.fmc_host} --token ${var.cdo_token}"
   }
 
-  depends_on = [fmc_policy_devices_assignments.policy_assignment01, fmc_policy_devices_assignments.policy_assignment02, null_resource.install_fmcapi]
+  depends_on = [fmc_policy_devices_assignments.policy_assignment01, fmc_policy_devices_assignments.policy_assignment02]
 }
 
 

@@ -8,8 +8,6 @@ variable "fmc_username" {
 }
 variable "cdo_host" {
 }
-variable "cdo_region" { 
-}
 variable "fmc_password" {
   default = "Cisco@123"
 }

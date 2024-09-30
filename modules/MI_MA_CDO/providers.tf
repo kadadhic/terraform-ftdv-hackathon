@@ -21,7 +21,7 @@ provider "aws" {
 
 provider "cdo" {
   api_token = var.cdo_token
-  base_url  = var.cdo-https-host
+  base_url  = local.https_cdo_host
 }
 
 provider "fmc" {

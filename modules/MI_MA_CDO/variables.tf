@@ -278,9 +278,3 @@ variable "cdo_token" {
 variable "cdo_host" {
   type        = string
 }
-variable "cdo_region" {
-  type        = string 
-}
-variable "cdo-https-host"{
-  type = string
-}

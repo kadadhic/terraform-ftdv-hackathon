@@ -349,7 +349,7 @@ resource "null_resource" "pbr" {
   depends_on = [time_sleep.wait_10_sec]
 
   provisioner "local-exec" {
-    command     = "terraform init && terraform apply -auto-approve -var='fmc_host=${var.fmc_host}' -var='cdo_token=${var.cdo_token}' -var='cdo_host=${var.cdo_host}' -var='cdo_region=${var.cdo_region}' "
+    command     = "terraform init && terraform apply -auto-approve -var='fmc_host=${var.fmc_host}' -var='cdo_token=${var.cdo_token}' -var='cdo_host=${local.www_cdo_host}' "
     working_dir = "${path.module}/pbr_configuration"
   }
 
