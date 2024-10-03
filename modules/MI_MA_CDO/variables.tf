@@ -13,6 +13,7 @@ variable "prefix" {
   type    = string
   default = "Fireglass"
 }
+
 variable "region" {
   type        = string
   description = "AWS REGION"
@@ -41,6 +42,12 @@ variable "mgmt_subnet_cidr" {
   description = "List out management Subnet CIDR . "
   type        = list(string)
   default     = ["172.16.1.0/24", "172.16.11.0/24"]
+}
+
+variable "ftd_version" {
+  description = "Version of the FTD"
+  type        = string
+  default     = "ftdv-7.4.2"
 }
 
 variable "ftd_mgmt_ip" {
@@ -264,7 +271,7 @@ variable "reg_key" {
 variable "nat_id" {
   type        = list(string)
   description = "NAT ID of the FTD"
-  default = ["", ""]
+  default     = ["", ""]
 }
 variable "fmc_host" {
   type        = string
@@ -276,5 +283,5 @@ variable "cdo_token" {
 }
 
 variable "cdo_host" {
-  type        = string
+  type = string
 }

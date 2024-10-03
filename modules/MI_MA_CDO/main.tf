@@ -1,36 +1,36 @@
 module "service_network" {
-  source                = "./modules/network"
-  vpc_cidr              = var.service_vpc_cidr
-  vpc_name              = var.service_vpc_name
-  create_igw            = var.service_create_igw
-  mgmt_subnet_cidr      = var.mgmt_subnet_cidr
-  ftd_mgmt_ip           = var.ftd_mgmt_ip
-  outside_subnet_cidr   = var.outside_subnet_cidr
-  ftd_outside_ip        = var.ftd_outside_ip
-  diag_subnet_cidr      = var.diag_subnet_cidr
-  ftd_diag_ip           = var.ftd_diag_ip
-  inside_subnet_cidr    = var.inside_subnet_cidr
-  ftd_inside_ip         = var.ftd_inside_ip
-  mgmt_subnet_name      = var.mgmt_subnet_name
-  outside_subnet_name   = var.outside_subnet_name
-  diag_subnet_name      = var.diag_subnet_name
-  inside_subnet_name    = var.inside_subnet_name
-  outside_interface_sg  = var.outside_interface_sg
-  inside_interface_sg   = var.inside_interface_sg
-  mgmt_interface_sg     = var.mgmt_interface_sg
-  use_ftd_eip           = var.use_ftd_eip
-  prefix                = var.prefix
+  source               = "./modules/network"
+  vpc_cidr             = var.service_vpc_cidr
+  vpc_name             = var.service_vpc_name
+  create_igw           = var.service_create_igw
+  mgmt_subnet_cidr     = var.mgmt_subnet_cidr
+  ftd_mgmt_ip          = var.ftd_mgmt_ip
+  outside_subnet_cidr  = var.outside_subnet_cidr
+  ftd_outside_ip       = var.ftd_outside_ip
+  diag_subnet_cidr     = var.diag_subnet_cidr
+  ftd_diag_ip          = var.ftd_diag_ip
+  inside_subnet_cidr   = var.inside_subnet_cidr
+  ftd_inside_ip        = var.ftd_inside_ip
+  mgmt_subnet_name     = var.mgmt_subnet_name
+  outside_subnet_name  = var.outside_subnet_name
+  diag_subnet_name     = var.diag_subnet_name
+  inside_subnet_name   = var.inside_subnet_name
+  outside_interface_sg = var.outside_interface_sg
+  inside_interface_sg  = var.inside_interface_sg
+  mgmt_interface_sg    = var.mgmt_interface_sg
+  use_ftd_eip          = var.use_ftd_eip
+  prefix               = var.prefix
 }
 
 resource "fmc_access_policies" "fmc_access_policy" {
-  depends_on = [ module.service_network ]
+  depends_on     = [module.service_network]
   name           = "FireGlass-access-policy"
   default_action = "PERMIT"
 }
 
 resource "cdo_ftd_device" "ftd" {
   count              = var.availability_zone_count
-  name               = "FTD${count.index+1}"
+  name               = "FTD${count.index + 1}"
   licenses           = ["BASE"]
   virtual            = true
   performance_tier   = "FTDv50"
@@ -39,6 +39,7 @@ resource "cdo_ftd_device" "ftd" {
 module "instance" {
   source                  = "./modules/firewall_instance"
   keyname                 = "${var.prefix}-${var.keyname}"
+  ftd_version             = var.ftd_version
   ftd_size                = var.ftd_size
   instances_per_az        = var.instances_per_az
   availability_zone_count = var.availability_zone_count
@@ -122,7 +123,7 @@ resource "aws_lb_target_group_attachment" "target1_1b" {
 
 data "aws_availability_zones" "available" {}
 
-data "aws_vpc" "fireglass-vpc"{
+data "aws_vpc" "fireglass-vpc" {
   depends_on = [module.service_network]
   filter {
     name   = "tag:Name"
@@ -130,7 +131,7 @@ data "aws_vpc" "fireglass-vpc"{
   }
 }
 
-data "aws_security_group" "sg"{
+data "aws_security_group" "sg" {
   depends_on = [module.service_network]
   filter {
     name   = "tag:Name"
@@ -146,11 +147,11 @@ data "aws_security_group" "sg"{
 # }
 
 variable "public_subnet_cidr" {
-  default = ["172.16.5.0/24","172.16.15.0/24"]
+  default = ["172.16.5.0/24", "172.16.15.0/24"]
 }
 
 variable "ftd_public_ip" {
-  default = ["172.16.5.10","172.16.15.10"]
+  default = ["172.16.5.10", "172.16.15.10"]
 }
 
 resource "aws_subnet" "public_subnet" {
@@ -160,7 +161,7 @@ resource "aws_subnet" "public_subnet" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
-    Name = "${var.prefix}-Public-subnet-${count.index+1}"
+    Name = "${var.prefix}-Public-subnet-${count.index + 1}"
   }
 }
 
@@ -170,13 +171,13 @@ resource "aws_network_interface" "ftd_public" {
   subnet_id         = aws_subnet.public_subnet[count.index].id
   source_dest_check = false
   private_ips       = [var.ftd_public_ip[count.index]]
-   security_groups   = [data.aws_security_group.sg.id]
+  security_groups   = [data.aws_security_group.sg.id]
 }
 
 resource "aws_route_table" "ftd_public_route" {
-  count  = 2 //length(local.outside_subnet)
-  vpc_id = data.aws_vpc.fireglass-vpc.id//local.con
-   route {
+  count  = 2                             //length(local.outside_subnet)
+  vpc_id = data.aws_vpc.fireglass-vpc.id //local.con
+  route {
     cidr_block = "0.0.0.0/0"
     gateway_id = data.aws_internet_gateway.int_gw.id
   }
@@ -199,7 +200,7 @@ resource "aws_eip" "ftd_public_eip" {
 }
 
 resource "aws_eip_association" "ftd_public_ip_assocation" {
-  depends_on = [module.instance,module.service_network]
+  depends_on           = [module.instance, module.service_network]
   count                = length(aws_eip.ftd_public_eip)
   network_interface_id = aws_network_interface.ftd_public[count.index].id
   allocation_id        = aws_eip.ftd_public_eip[count.index].id
@@ -210,14 +211,14 @@ resource "aws_eip_association" "ftd_public_ip_assocation" {
 #########################################################################################################
 
 data "aws_subnet" "inside-subnet" {
-depends_on = [module.service_network]
+  depends_on = [module.service_network]
   filter {
     name   = "tag:Name"
     values = ["${var.prefix}-inside_subnet-1"]
   }
 }
 
-data "aws_security_group" "inside-sg"{
+data "aws_security_group" "inside-sg" {
   depends_on = [module.service_network]
   filter {
     name   = "tag:Name"
@@ -242,11 +243,11 @@ resource "aws_network_interface_sg_attachment" "ftd_app_attachment" {
 }
 
 resource "aws_instance" "EC2-Ubuntu" {
-  depends_on = [ module.service_network,module.instance ]
+  depends_on    = [module.service_network, module.instance]
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  key_name      = "${var.prefix}-${var.keyname}"//var.keyname
-  
+  key_name      = "${var.prefix}-${var.keyname}" //var.keyname
+
   # user_data = data.template_file.apache_install.rendered
   network_interface {
     network_interface_id = aws_network_interface.ftd_app.id
@@ -279,7 +280,7 @@ data "aws_ami" "ubuntu" {
 # Creation of Bastion subnet and Bastion VM 
 #########################################################################################################
 data "aws_internet_gateway" "int_gw" {
-   depends_on = [module.service_network, module.instance]
+  depends_on = [module.service_network, module.instance]
   filter {
     name   = "tag:Name"
     values = ["${var.prefix}-Internet Gateway"]
@@ -293,7 +294,7 @@ resource "aws_subnet" "bastion_subnet" {
   map_public_ip_on_launch = true
 
   tags = merge({
-    Name = "${var.prefix}-bastion-Subnet"})
+  Name = "${var.prefix}-bastion-Subnet" })
 }
 
 resource "aws_network_interface" "bastion_interface" {
@@ -311,7 +312,7 @@ resource "aws_network_interface_sg_attachment" "bastion_attachment" {
 resource "aws_route_table" "bastion_route" {
   vpc_id = data.aws_vpc.fireglass-vpc.id
   tags = {
-    Name = "${var.prefix}-bastion network Routing table"}
+  Name = "${var.prefix}-bastion network Routing table" }
 }
 
 resource "aws_route_table_association" "bastion_association" {
