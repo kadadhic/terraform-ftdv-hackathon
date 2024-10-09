@@ -273,9 +273,9 @@ variable "nat_id" {
   description = "NAT ID of the FTD"
   default     = ["", ""]
 }
-variable "fmc_host" {
+variable "cdfmc_host" {
   type        = string
-  description = "FTD host IP"
+  description = "cdFMC host domain name"
 }
 variable "cdo_token" {
   type        = string

@@ -4,7 +4,7 @@
 # }
 
 output "CDFMC_URL" {
-  value = "https://${var.fmc_host}"
+  value = "https://${var.cdfmc_host}"
 }
 
 output "Bastion_SSH_Command" {

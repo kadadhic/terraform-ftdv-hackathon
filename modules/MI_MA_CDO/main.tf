@@ -51,7 +51,7 @@ module "instance" {
   prefix                  = var.prefix
   reg_key                 = cdo_ftd_device.ftd.*.reg_key
   nat_id                  = cdo_ftd_device.ftd.*.nat_id
-  fmc_host                = var.fmc_host
+  fmc_host                = var.cdfmc_host
   ftd_eip                 = module.service_network.aws_ftd_eip
 }
 resource "cdo_ftd_device_onboarding" "ftd1" {
@@ -350,7 +350,7 @@ resource "null_resource" "pbr" {
   depends_on = [time_sleep.wait_10_sec]
 
   provisioner "local-exec" {
-    command     = "terraform init && terraform apply -auto-approve -var='fmc_host=${var.fmc_host}' -var='cdo_token=${var.cdo_token}' -var='cdo_host=${local.www_cdo_host}' "
+    command     = "terraform init && terraform apply -auto-approve -var='fmc_host=${var.cdfmc_host}' -var='cdo_token=${var.cdo_token}' -var='cdo_host=${local.www_cdo_host}' "
     working_dir = "${path.module}/pbr_configuration"
   }
 
