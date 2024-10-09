@@ -1,3 +1,7 @@
+locals {
+  fmc_ip = var.create_fmc ? aws_eip.fmcmgmt-EIP[0].public_ip : var.fmc_host
+}
+
 #########################################################################################################################
 # Network
 #########################################################################################################################
@@ -20,7 +24,7 @@ resource "aws_subnet" "mgmt_subnet" {
 }
 
 resource "aws_subnet" "diag_subnet" {
-  vpc_id            =  aws_vpc.ftd_vpc.id
+  vpc_id = aws_vpc.ftd_vpc.id
 
   cidr_block        = var.diag_subnet
   availability_zone = "${var.region}a"
@@ -30,7 +34,7 @@ resource "aws_subnet" "diag_subnet" {
 }
 
 resource "aws_subnet" "outside_subnet" {
-  vpc_id            =  aws_vpc.ftd_vpc.id
+  vpc_id = aws_vpc.ftd_vpc.id
 
   cidr_block        = var.outside_subnet
   availability_zone = "${var.region}a"
@@ -81,9 +85,9 @@ resource "aws_security_group" "allow_all" {
 # Network Interfaces, FTD instance, Attaching the SG to interfaces
 ##################################################################################################################################
 resource "aws_network_interface" "ftd01mgmt" {
-  description   = "ftd01-mgmt"
-  subnet_id     = aws_subnet.mgmt_subnet.id
-  private_ips   = [var.ftd01_mgmt_ip]
+  description = "ftd01-mgmt"
+  subnet_id   = aws_subnet.mgmt_subnet.id
+  private_ips = [var.ftd01_mgmt_ip]
 }
 
 resource "aws_network_interface" "ftd01diag" {
@@ -92,20 +96,20 @@ resource "aws_network_interface" "ftd01diag" {
 }
 
 resource "aws_network_interface" "ftd01outside" {
-  description = "ftd01-outside"
-  subnet_id   = aws_subnet.outside_subnet.id
-  private_ips = [var.ftd01_outside_ip]
+  description       = "ftd01-outside"
+  subnet_id         = aws_subnet.outside_subnet.id
+  private_ips       = [var.ftd01_outside_ip]
   source_dest_check = false
 }
 
 resource "aws_network_interface" "ftd01inside" {
-  description = "ftd01-inside"
-  subnet_id   = aws_subnet.inside_subnet.id
-  private_ips = [var.ftd01_inside_ip]
+  description       = "ftd01-inside"
+  subnet_id         = aws_subnet.inside_subnet.id
+  private_ips       = [var.ftd01_inside_ip]
   source_dest_check = false
 }
 resource "aws_network_interface" "fmcmgmt" {
-  count             = var.create_fmc?1:0
+  count             = var.create_fmc ? 1 : 0
   description       = "Fmc_Management"
   subnet_id         = aws_subnet.mgmt_subnet.id
   source_dest_check = false
@@ -129,7 +133,7 @@ resource "aws_network_interface_sg_attachment" "ftd_inside_attachment" {
   network_interface_id = aws_network_interface.ftd01inside.id
 }
 resource "aws_network_interface_sg_attachment" "fmc_attachment" {
-  count                = var.create_fmc?1:0
+  count                = var.create_fmc ? 1 : 0
   depends_on           = [aws_network_interface.fmcmgmt]
   security_group_id    = aws_security_group.allow_all.id
   network_interface_id = aws_network_interface.fmcmgmt[0].id
@@ -171,9 +175,9 @@ resource "aws_route" "ext_default_route" {
 
 //To define the default route for inside network thur FTDv inside interface 
 resource "aws_route" "inside_default_route" {
-  route_table_id          = aws_route_table.ftd_inside_route.id
-  destination_cidr_block  = "0.0.0.0/0"
-  network_interface_id    = aws_network_interface.ftd01inside.id
+  route_table_id         = aws_route_table.ftd_inside_route.id
+  destination_cidr_block = "0.0.0.0/0"
+  network_interface_id   = aws_network_interface.ftd01inside.id
 
 }
 
@@ -215,19 +219,19 @@ resource "aws_eip_association" "ftd01-mgmt-ip-assocation" {
   allocation_id        = aws_eip.ftd01mgmt-EIP.id
 }
 resource "aws_eip_association" "ftd01-outside-ip-association" {
-    network_interface_id = aws_network_interface.ftd01outside.id
-    allocation_id        = aws_eip.ftd01outside-EIP.id
+  network_interface_id = aws_network_interface.ftd01outside.id
+  allocation_id        = aws_eip.ftd01outside-EIP.id
 }
 
 resource "aws_eip" "fmcmgmt-EIP" {
-  count             = var.create_fmc?1:0
+  count  = var.create_fmc ? 1 : 0
   domain = "vpc"
   tags = {
     "Name" = "${var.prefix}-FMCv Management IP"
   }
 }
 resource "aws_eip_association" "fmc-mgmt-ip-assocation" {
-  count             = var.create_fmc?1:0
+  count                = var.create_fmc ? 1 : 0
   network_interface_id = aws_network_interface.fmcmgmt[0].id
   allocation_id        = aws_eip.fmcmgmt-EIP[0].id
 }
@@ -240,10 +244,10 @@ resource "aws_eip_association" "fmc-mgmt-ip-assocation" {
 
 
 resource "aws_instance" "ftdv" {
-  count               = var.create_fmc?1:0
-  ami                 = data.aws_ami.ftdv.id
-  instance_type       = var.ftd_size
-  key_name            = var.keyname
+  count         = var.create_fmc ? 1 : 0
+  ami           = data.aws_ami.ftdv.id
+  instance_type = var.ftd_size
+  key_name      = var.keyname
   network_interface {
     network_interface_id = aws_network_interface.ftd01mgmt.id
     device_index         = 0
@@ -267,10 +271,10 @@ resource "aws_instance" "ftdv" {
 }
 
 resource "aws_instance" "ftdv-solo" {
-  count               = var.create_fmc?0:1
-  ami                 = data.aws_ami.ftdv.id
-  instance_type       = var.ftd_size
-  key_name            = var.keyname
+  count         = var.create_fmc ? 0 : 1
+  ami           = data.aws_ami.ftdv.id
+  instance_type = var.ftd_size
+  key_name      = var.keyname
   network_interface {
     network_interface_id = aws_network_interface.ftd01mgmt.id
     device_index         = 0
@@ -294,10 +298,10 @@ resource "aws_instance" "ftdv-solo" {
 }
 
 resource "aws_instance" "fmcv" {
-  count               = var.create_fmc?1:0
-  ami                 = data.aws_ami.fmcv[0].id
-  instance_type       = "c5.4xlarge"
-  key_name            = var.keyname   
+  count         = var.create_fmc ? 1 : 0
+  ami           = data.aws_ami.fmcv[0].id
+  instance_type = "c5.4xlarge"
+  key_name      = var.keyname
   network_interface {
     network_interface_id = aws_network_interface.fmcmgmt[0].id
     device_index         = 0
