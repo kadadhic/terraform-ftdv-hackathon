@@ -93,7 +93,7 @@ variable "fmc_ip" {
 
 variable "availability_zone_count" {
   type        = number
-  description = "Spacified availablity zone count . "
+  description = "Specified availablity zone count . "
   default     = 2
 }
 
@@ -195,7 +195,7 @@ variable "fmc_mgmt_interface_sg" {
 
 variable "instances_per_az" {
   type        = number
-  description = "Spacified no. of instance per az wants to be create . "
+  description = "Specified no. of instance per az wants to be create . "
   default     = 1
 }
 
