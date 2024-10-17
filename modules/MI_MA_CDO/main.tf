@@ -35,7 +35,16 @@ resource "cdo_ftd_device" "ftd" {
   virtual            = true
   performance_tier   = "FTDv50"
   access_policy_name = fmc_access_policies.fmc_access_policy.name
+  depends_on         = [null_resource.clear_cdfmc]
 }
+
+resource "null_resource" "clear_cdfmc" {
+  provisioner "local-exec" {
+    when    = destroy
+    command = "python clear_cdfmc.py --token ${var.cdo_token} --host https://${var.cdfmc_host}"
+  }
+}
+
 module "instance" {
   source                  = "./modules/firewall_instance"
   keyname                 = "${var.prefix}-${var.keyname}"

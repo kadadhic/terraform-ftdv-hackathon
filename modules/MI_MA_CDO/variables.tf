@@ -275,7 +275,7 @@ variable "nat_id" {
 }
 variable "cdfmc_host" {
   type        = string
-  description = "cdFMC host domain name"
+  description = "cdFMC host domain name(meaning without https://)"
 }
 variable "cdo_token" {
   type        = string

@@ -8,10 +8,10 @@ terraform {
 }
 
 provider "fmc" {
-  is_cdfmc = true
-  cdo_token = var.cdo_token 
-  fmc_host = var.fmc_host
-  cdfmc_domain_uuid = "e276abec-e0f2-11e3-8169-6d9ed49b625f"
+  is_cdfmc                 = true
+  cdo_token                = var.cdo_token
+  fmc_host                 = var.fmc_host
+  cdfmc_domain_uuid        = "e276abec-e0f2-11e3-8169-6d9ed49b625f"
   fmc_insecure_skip_verify = true
 }
 
@@ -19,39 +19,39 @@ provider "fmc" {
 # # Data blocks
 # ################################################################################################
 data "fmc_devices" "device01" {
-    name = "FTD1"
+  name = "FTD1"
 }
 data "fmc_devices" "device02" {
-    name = "FTD2"
+  name = "FTD2"
 }
 data "fmc_network_objects" "any-ipv4" {
-  name       = "any-ipv4"
+  name = "any-ipv4"
 }
 #1st device
 data "fmc_device_physical_interfaces" "zero_physical_interface_device01" {
-  device_id  = data.fmc_devices.device01.id
-  name       = "TenGigabitEthernet0/0"
+  device_id = data.fmc_devices.device01.id
+  name      = "TenGigabitEthernet0/0"
 }
 data "fmc_device_physical_interfaces" "one_physical_interface_device01" {
-  device_id  = data.fmc_devices.device01.id
-  name       = "TenGigabitEthernet0/1"
+  device_id = data.fmc_devices.device01.id
+  name      = "TenGigabitEthernet0/1"
 }
 data "fmc_device_physical_interfaces" "two_physical_interface_device01" {
-  device_id  = data.fmc_devices.device01.id
-  name       = "TenGigabitEthernet0/2"
+  device_id = data.fmc_devices.device01.id
+  name      = "TenGigabitEthernet0/2"
 }
 #2nd device
 data "fmc_device_physical_interfaces" "zero_physical_interface_device02" {
-  device_id  = data.fmc_devices.device02.id
-  name       = "TenGigabitEthernet0/0"
+  device_id = data.fmc_devices.device02.id
+  name      = "TenGigabitEthernet0/0"
 }
 data "fmc_device_physical_interfaces" "one_physical_interface_device02" {
-  device_id  = data.fmc_devices.device02.id
-  name       = "TenGigabitEthernet0/1"
+  device_id = data.fmc_devices.device02.id
+  name      = "TenGigabitEthernet0/1"
 }
 data "fmc_device_physical_interfaces" "two_physical_interface_device02" {
-  device_id  = data.fmc_devices.device02.id
-  name       = "TenGigabitEthernet0/2"
+  device_id = data.fmc_devices.device02.id
+  name      = "TenGigabitEthernet0/2"
 }
 ################################################################################################
 # Security Zones
@@ -417,7 +417,7 @@ resource "fmc_policy_devices_assignments" "policy_assignment02" {
 
 resource "null_resource" "run_python_script" {
   provisioner "local-exec" {
-    command = "python3  ${path.module}/fmc.py --host ${var.fmc_host} --token ${var.cdo_token}"
+    command = "python3 ${path.module}/fmc.py --host ${var.fmc_host} --token ${var.cdo_token}"
   }
 
   depends_on = [fmc_policy_devices_assignments.policy_assignment01, fmc_policy_devices_assignments.policy_assignment02]
