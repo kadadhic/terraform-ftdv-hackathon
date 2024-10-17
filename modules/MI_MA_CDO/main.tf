@@ -39,9 +39,14 @@ resource "cdo_ftd_device" "ftd" {
 }
 
 resource "null_resource" "clear_cdfmc" {
+  triggers = {
+    cdo_token  = var.cdo_token
+    cdfmc_host = var.cdfmc_host
+  }
+
   provisioner "local-exec" {
     when    = destroy
-    command = "python clear_cdfmc.py --token ${var.cdo_token} --host https://${var.cdfmc_host}"
+    command = "python clear_cdfmc.py --token ${self.triggers.cdo_token} --host https://${self.triggers.cdfmc_host}"
   }
 }
 
