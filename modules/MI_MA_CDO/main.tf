@@ -46,7 +46,7 @@ resource "null_resource" "clear_cdfmc" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "python clear_cdfmc.py --token ${self.triggers.cdo_token} --host https://${self.triggers.cdfmc_host}"
+    command = "python3 ${path.module}/clear_cdfmc.py --token ${self.triggers.cdo_token} --host https://${self.triggers.cdfmc_host}"
   }
 }
 
