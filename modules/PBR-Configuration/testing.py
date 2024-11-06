@@ -2,36 +2,37 @@
 
 import argparse
 import json
-import time
 
-import fmcapi
+# import fmcapi
 import requests
+
+# import time
 
 
 def main(args):
     print("IN main-aws")
 
-    with fmcapi.FMC(host=args.addr, username=args.username, password=args.password, autodeploy=False) as fmc:
-        namer = "extended_net_acl"
-        ext_acl = fmcapi.ExtendedAccessList(fmc=fmc)
-        ext_acl.name = namer
-        ext_acl.entries = []
+    # with fmcapi.FMC(host=args.addr, username=args.username, password=args.password, autodeploy=False) as fmc:
+        # namer = "extended_net_acl"
+        # ext_acl = fmcapi.ExtendedAccessList(fmc=fmc)
+        # ext_acl.name = namer
+        # ext_acl.entries = []
 
-        ace = fmcapi.ExtendedAccessListAce()
-        ace.action = "PERMIT"
-        ace.destinationNetworksLiterals = [
-            {
-                "type": "Network",
-                "value": "0.0.0.0/0"
-            }
-        ]
+        # ace = fmcapi.ExtendedAccessListAce()
+        # ace.action = "PERMIT"
+        # ace.destinationNetworksLiterals = [
+        #     {
+        #         "type": "Network",
+        #         "value": "0.0.0.0/0"
+        #     }
+        # ]
 
-        ace.sourceNetworksLiterals = [
-            {
-                "type": "Network",
-                "value": "172.16.3.0/24"
-            }
-        ]
+        # ace.sourceNetworksLiterals = [
+        #     {
+        #         "type": "Network",
+        #         "value": "172.16.3.0/24"
+        #     }
+        # ]
 
         # ace.destinationPortsLiterals = [
         #     {
@@ -49,14 +50,14 @@ def main(args):
         #     }
         # ]
 
-        ext_acl.entries.append(ace.build_ace())
-        print("------------- Post Extended Access List ---------------")
-        ext_acl.post()
-        global acl
-        acl = ext_acl.get()
+        # ext_acl.entries.append(ace.build_ace())
+        # print("------------- Post Extended Access List ---------------")
+        # ext_acl.post()
+        # global acl
+        # acl = ext_acl.get()
 
-        print("------------- Extended Access List ID ---------------")
-        print(acl['id'])
+        # print("------------- Extended Access List ID ---------------")
+        # print(acl['id'])
 
 
 def unknown(args):
@@ -120,6 +121,47 @@ def unknown(args):
     print(phyID2)
     print(phyID3)
 
+    ### eACL
+    eaclurl = "https://"+host+"/api/fmc_config/v1/domain/"+domainUUID+"/object/extendedaccesslists"
+    payload_apps = [{
+                        "id": "1326",
+                        "type": "Application",
+                        "name": "Box"
+                    }, {
+                        "id": "2038",
+                        "type": "Application",
+                        "name": "Atlassian"
+                    }, {
+                        "id": "2037",
+                        "type": "Application",
+                        "name": "Splunk"
+                    }]
+
+    response_eacl_ids = []
+
+    for app in payload_apps:
+        payload = json.dumps({
+            "name": f"{app.name}-ACL",
+            "entries": [
+                {
+                    "logLevel": "ERROR",
+                    "action": "PERMIT",
+                    "logging": "PER_ACCESS_LIST_ENTRY",
+                    "logInterval": 545,
+                    "applications": {
+                        "applications": [app]
+                    }
+                }
+            ]
+        })
+
+        eaclresponse = requests.request("POST", eaclurl, headers=headers, data=payload, verify=False)
+        json_eacl = json.loads(eaclresponse.text)
+
+        print("--------------------Printing eACL Name--------------------")
+        print(json_eacl['name'])
+        response_eacl_ids.append(json_eacl['id'])
+
     #####PBR
     pbrurl = baseurl + "/" + deviceID1 + "/policybasedroutes"  # CHANGE TO PBR
     payload = json.dumps({
@@ -131,11 +173,10 @@ def unknown(args):
         ],
         "name": "PBR-req-test",
         "forwardingActions": [{
-            "forwardingActionType": "SET_EGRESS_INTF_BY_ORDER",
+            "forwardingActionType": "SET_EGRESS_INTF_BY_LOST_PKTS",
             "matchCriteria": {
-                "id": f"{acl['id']}"
+                "id": f"{response_eacl_ids[0]}"
             },
-            "defaultInterface": True,
             "egressInterfaces": [
                 {
                     ### Outside2 Interface ###
@@ -144,6 +185,36 @@ def unknown(args):
                 {
                     ### Outside Interface ###
                     "id": f"{phyID1}"
+                }
+            ]},
+            {
+            "forwardingActionType": "SET_EGRESS_INTF_BY_JITTER",
+            "matchCriteria": {
+                "id": f"{response_eacl_ids[1]}"
+            },
+            "egressInterfaces": [
+                {
+                    ### Outside2 Interface ###
+                    "id": f"{phyID2}"
+                },
+                {
+                    ### Outside Interface ###
+                    "id": f"{phyID1}"
+                }
+            ]},
+            {
+            "forwardingActionType": "SET_EGRESS_INTF_BY_ORDER",
+            "matchCriteria": {
+                "id": f"{response_eacl_ids[2]}"
+            },
+            "egressInterfaces": [
+                {
+                    ### Outside Interface ###
+                    "id": f"{phyID1}"
+                },
+                {
+                    ### Outside2 Interface ###
+                    "id": f"{phyID2}"
                 }
             ]}
         ]
