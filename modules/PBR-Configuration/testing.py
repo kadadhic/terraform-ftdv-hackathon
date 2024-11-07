@@ -8,7 +8,6 @@ import requests
 
 # import time
 
-
 def main(args):
     print("IN main-aws")
 
@@ -141,7 +140,7 @@ def unknown(args):
 
     for app in payload_apps:
         payload = json.dumps({
-            "name": f"{app.name}-ACL",
+            "name": f"{app['name']}-ACL",
             "entries": [
                 {
                     "logLevel": "ERROR",
