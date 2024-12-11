@@ -30,7 +30,7 @@ resource "fmc_access_policies" "fmc_access_policy" {
 
 resource "cdo_ftd_device" "ftd" {
   count              = var.availability_zone_count
-  name               = "FTD${count.index + 1}"
+  name               = "${var.ftd_name}${count.index + 1}"
   licenses           = ["BASE"]
   virtual            = true
   performance_tier   = "FTDv50"
