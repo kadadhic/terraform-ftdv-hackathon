@@ -51,3 +51,12 @@ output "outside_interface_ip" {
 output "dmz_interface_ip" {
   value = aws_network_interface.asa_dmz.*.private_ip_list
 }
+
+output "key_name"{
+  value=aws_key_pair.public_key.key_name
+}
+
+output "private_key" {
+  value = tls_private_key.key_pair.private_key_openssh
+  sensitive = true
+}
