@@ -3,10 +3,10 @@
 
 ############################################################
 #AWS Creditials to access the AWS Cloud
-#############################################################
-aws_access_key = ""
+# #############################################################
+# aws_access_key = ""
 
-aws_secret_key = ""
+# aws_secret_key = ""
 
 ############################################################
 #Define New VPC in a specific Region and Avilability Zone 

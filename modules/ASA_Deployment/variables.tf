@@ -1,8 +1,8 @@
 // defining the subnets variables with the default value for Three Tier Architecure. 
 
-variable "aws_access_key" {}
+# variable "aws_access_key" {}
  
-variable "aws_secret_key" {}
+# variable "aws_secret_key" {}
 
 variable "vpc_cidr" {
   

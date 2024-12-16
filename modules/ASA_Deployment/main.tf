@@ -19,7 +19,7 @@ module "network" {
 
 module "instance" {
   source                  = "./FirewallServer"
-  keyname                 = var.keyname
+  keyname                 = module.network.key_name
   asa_size                = var.asa_size
   instances_per_az        = var.instances_per_az
   availability_zone_count = var.availability_zone_count
