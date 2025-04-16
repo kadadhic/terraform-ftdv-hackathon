@@ -276,6 +276,70 @@
           }
        },
        {
+         "type": "Microsoft.Network/routeTables",
+         "apiVersion": "2020-06-01",
+         "name": "outsideVMRouteTable",
+         "location": "[parameters('location')]",
+         "properties": {
+           "routes": [
+             {
+               "name": "defaultRouteToFTD",
+               "properties": {
+                 "addressPrefix": "0.0.0.0/0",
+                 "nextHopType": "VirtualAppliance",
+                 "nextHopIpAddress": "[parameters('data1SubnetIP')]"
+               }
+             }
+           ]
+         }
+       },
+       {
+         "type": "Microsoft.Network/virtualNetworks/subnets",
+         "apiVersion": "2020-06-01",
+         "name": "[concat(parameters('virtualNetworkName'), '/', parameters('data1SubnetName'))]",
+         "dependsOn": [
+           "[resourceId('Microsoft.Network/routeTables', 'outsideVMRouteTable')]"
+         ],
+         "properties": {
+           "addressPrefix": "10.4.2.0/24",
+           "routeTable": {
+             "id": "[resourceId('Microsoft.Network/routeTables', 'outsideVMRouteTable')]"
+           }
+         }
+       },
+       {
+         "type": "Microsoft.Network/routeTables",
+         "apiVersion": "2020-06-01",
+         "name": "insideVMRouteTable",
+         "location": "[parameters('location')]",
+         "properties": {
+           "routes": [
+             {
+               "name": "defaultRouteToFTD",
+               "properties": {
+                 "addressPrefix": "0.0.0.0/0",
+                 "nextHopType": "VirtualAppliance",
+                 "nextHopIpAddress": "[parameters('data2SubnetIP')]"
+               }
+             }
+           ]
+         }
+       },
+       {
+         "type": "Microsoft.Network/virtualNetworks/subnets",
+         "apiVersion": "2020-06-01",
+         "name": "[concat(parameters('virtualNetworkName'), '/', parameters('data2SubnetName'))]",
+         "dependsOn": [
+           "[resourceId('Microsoft.Network/routeTables', 'insideVMRouteTable')]"
+         ],
+         "properties": {
+           "addressPrefix": "10.4.3.0/24",
+           "routeTable": {
+             "id": "[resourceId('Microsoft.Network/routeTables', 'insideVMRouteTable')]"
+           }
+         }
+       },
+       {
           "apiVersion": "2023-06-01",
           "type": "Microsoft.Network/publicIPAddresses",
           "name": "[variables('vmMgmtPublicIPAddressName')]",
@@ -401,7 +465,7 @@
                            "protocol": "Tcp",
                            "sourcePortRange": "*",
                            "destinationPortRange": "*",
-                           "sourceAddressPrefix": "10.0.3.0/24",
+                           "sourceAddressPrefix": "10.4.0.0/16",
                            "destinationAddressPrefix": "*",
                            "access": "Allow",
                            "priority": 110,
@@ -722,7 +786,7 @@
          "location": "[parameters('location')]",
          "dependsOn": [
              "[resourceId('Microsoft.Network/networkInterfaces',variables('vmNic0Name'))]",
-             "[resourceId('Microsoft.Network/networkInterfaces',variables('vmNic5Name'))]"
+             "[resourceId('Microsoft.Network/networkInterfaces',variables('vmNic6Name'))]"
           ],
           "properties": {
             "hardwareProfile": {
@@ -762,5 +826,14 @@
           "zones": "[variables('selectedAvailZone')]"
        }
     ],
-    "outputs": {}
+    "outputs": {
+      "vmMgmtPublicIP": {
+         "type": "string",
+         "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('vmMgmtPublicIPAddressName'))).ipAddress]"
+      },
+      "hostOutsidePublicIP": {
+         "type": "string",
+         "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('hostOutsidePublicIPAddressName'))).ipAddress]"
+      }
+   }
 }

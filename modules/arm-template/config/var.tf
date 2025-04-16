@@ -1,6 +1,6 @@
-variable "fmc_host" {
-    type = string
-    default = ""
+variable "cdfmc_host" {
+  type    = string
+  default = ""
 }
 
 variable "fmc_username" {
