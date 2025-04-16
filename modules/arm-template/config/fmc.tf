@@ -51,17 +51,17 @@ resource "fmc_security_zone" "outside01" {
 ################################################################################################
 resource "fmc_network_objects" "corporate-lan01" {
   name  = "Inside-subnet-01"
-  value = "10.4.2.0/24"
+  value = "10.4.3.0/24"
 }
 
 resource "fmc_network_objects" "outside-subnet-01" {
   name  = "Outside-subnet-01"
-  value = "10.4.3.0/24"
+  value = "10.4.2.0/24"
 }
 
 resource "fmc_host_objects" "outside01-gw" {
   name  = "Outside01-GW"
-  value = "10.4.3.1"
+  value = "10.4.2.1"
 }
 
 ################################################################################################
