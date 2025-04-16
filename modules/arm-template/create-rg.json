@@ -1,0 +1,35 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "virtualNetworkResourceGroup": {
+          "type": "string",
+          "defaultValue": "arm-ftdv-rg",
+          "metadata": {
+             "description": "Name of the virtual network's Resource Group"
+          }
+       },
+      "location": {
+        "type": "string",
+        "defaultValue": "eastus",
+        "metadata": {
+          "description": "Location for the resource group"
+        }
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Resources/resourceGroups",
+        "apiVersion": "2021-04-01",
+        "name": "[parameters('virtualNetworkResourceGroup')]",
+        "location": "[parameters('location')]"
+      }
+    ],
+    "outputs": {
+      "virtualNetworkResourceGroup": {
+        "type": "string",
+        "value": "[parameters('virtualNetworkResourceGroup')]"
+      }
+    }
+  }
+  
