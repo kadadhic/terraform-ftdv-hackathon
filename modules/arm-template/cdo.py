@@ -1,5 +1,9 @@
-import Devmiko
+#! .venv/bin/python3
+
 import argparse
+
+import Devmiko
+
 
 def main(args):
     host = args.host
