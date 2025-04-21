@@ -512,6 +512,10 @@
           "type": "Microsoft.Network/networkInterfaces",
           "name": "[variables('vmNic1Name')]",
           "location": "[parameters('location')]",
+          "dependsOn": [
+             "[resourceId('Microsoft.Network/networkSecurityGroups',variables('dataNsgName'))]",
+             "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]"
+          ],
           "properties": {
              "ipConfigurations": [
                 {
