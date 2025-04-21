@@ -298,6 +298,7 @@
          "apiVersion": "2020-06-01",
          "name": "[concat(parameters('virtualNetworkName'), '/', parameters('data1SubnetName'))]",
          "dependsOn": [
+           "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
            "[resourceId('Microsoft.Network/routeTables', 'outsideVMRouteTable')]"
          ],
          "properties": {
@@ -312,6 +313,9 @@
          "apiVersion": "2020-06-01",
          "name": "insideVMRouteTable",
          "location": "[parameters('location')]",
+         "dependsOn": [
+            "[resourceId('Microsoft.Network/routeTables', 'outsideVMRouteTable')]"
+         ],
          "properties": {
            "routes": [
              {
@@ -330,6 +334,7 @@
          "apiVersion": "2020-06-01",
          "name": "[concat(parameters('virtualNetworkName'), '/', parameters('data2SubnetName'))]",
          "dependsOn": [
+           "[variables('subnet3Ref')]",
            "[resourceId('Microsoft.Network/routeTables', 'insideVMRouteTable')]"
          ],
          "properties": {
@@ -385,7 +390,7 @@
                       "protocol": "Tcp",
                       "sourcePortRange": "*",
                       "destinationPortRange": "22",
-                      "sourceAddressPrefix": "122.171.0.0/16",
+                      "sourceAddressPrefix": "151.186.192.0/20",
                       "destinationAddressPrefix": "*",
                       "access": "Allow",
                       "priority": 100,
@@ -471,7 +476,7 @@
                            "priority": 110,
                            "direction": "Inbound"
                      }
-                  }
+                   }
                 ]
           }
        },
@@ -482,6 +487,7 @@
           "location": "[parameters('location')]",
           "dependsOn": [
              "[resourceId('Microsoft.Network/networkSecurityGroups',variables('mgtNsgName'))]",
+             "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
              "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmMgmtPublicIPAddressName'))]"
           ],
           "properties": {
@@ -539,6 +545,7 @@
           "name": "[variables('vmNic2Name')]",
           "location": "[parameters('location')]",
           "dependsOn": [
+             "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
              "[resourceId('Microsoft.Network/networkSecurityGroups',variables('dataNsgName'))]"
           ],
           "properties": {
@@ -567,6 +574,7 @@
           "name": "[variables('vmNic3Name')]",
           "location": "[parameters('location')]",
           "dependsOn": [
+             "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
              "[resourceId('Microsoft.Network/networkSecurityGroups',variables('dataNsgName'))]"
           ],
           "properties": {
@@ -595,6 +603,7 @@
           "name": "[variables('vmNic4Name')]",
           "location": "[parameters('location')]",
           "dependsOn": [
+             "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
              "[resourceId('Microsoft.Network/networkSecurityGroups',variables('dataNsgName'))]"
           ],
           "properties": {
@@ -623,6 +632,8 @@
          "name": "[variables('vmNic5Name')]",
          "location": "[parameters('location')]",
          "dependsOn": [
+            "[resourceId('Microsoft.Network/networkInterfaces',variables('vmNic4Name'))]",
+            "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
             "[resourceId('Microsoft.Network/networkSecurityGroups',variables('mgtNsgName'))]",
             "[resourceId('Microsoft.Network/publicIPAddresses', variables('hostOutsidePublicIPAddressName'))]"
          ],
@@ -655,6 +666,8 @@
          "name": "[variables('vmNic6Name')]",
          "location": "[parameters('location')]",
          "dependsOn": [
+            "[resourceId('Microsoft.Network/networkInterfaces',variables('vmNic4Name'))]",
+            "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
             "[resourceId('Microsoft.Network/networkSecurityGroups',variables('dataNsgName'))]"
          ],
          "properties": {

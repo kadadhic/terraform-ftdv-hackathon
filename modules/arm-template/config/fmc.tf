@@ -19,7 +19,7 @@ provider "fmc" {
 # # Data blocks
 # ################################################################################################
 data "fmc_devices" "device01" {
-  name = "test-ngfw"
+  name = var.ftd_name
 }
 data "fmc_network_objects" "any-ipv4" {
   name = "any-ipv4"
@@ -142,8 +142,8 @@ resource "fmc_device_physical_interfaces" "physical_interfaces00" {
   device_id              = data.fmc_devices.device01.id
   physical_interface_id  = data.fmc_device_physical_interfaces.zero_physical_interface_device01.id
   name                   = data.fmc_device_physical_interfaces.zero_physical_interface_device01.name
-  security_zone_id       = fmc_security_zone.inside.id
-  if_name                = "inside"
+  security_zone_id       = fmc_security_zone.outside01.id
+  if_name                = "outside01"
   description            = "Applied by terraform"
   mtu                    = 1500
   mode                   = "NONE"
@@ -154,8 +154,8 @@ resource "fmc_device_physical_interfaces" "physical_interfaces01" {
   device_id              = data.fmc_devices.device01.id
   physical_interface_id  = data.fmc_device_physical_interfaces.one_physical_interface_device01.id
   name                   = data.fmc_device_physical_interfaces.one_physical_interface_device01.name
-  security_zone_id       = fmc_security_zone.outside01.id
-  if_name                = "outside01"
+  security_zone_id       = fmc_security_zone.inside.id
+  if_name                = "inside"
   description            = "Applied by terraform"
   mtu                    = 1500
   mode                   = "NONE"

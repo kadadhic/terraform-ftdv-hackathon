@@ -61,3 +61,8 @@ variable "ftd_name" {
   description = "This will be the name of the FTD that shows up in the cdFMC"
   default     = "FTD"
 }
+
+variable "virtualNetworkResourceGroup" {
+  type    = string
+  default = "arm-ftdv-rg"
+}

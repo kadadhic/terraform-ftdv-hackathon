@@ -5,7 +5,7 @@ resource "fmc_access_policies" "fmc_access_policy" {
 
 resource "null_resource" "Create_resource_group" {
   provisioner "local-exec" {
-    command     = "az deployment sub create --location EastUS --template-file create-rg.json --parameters virtualNetworkResourceGroup='teande-acme-rg'"
+    command     = "az deployment sub create --location EastUS --template-file create-rg.json --parameters virtualNetworkResourceGroup='${var.virtualNetworkResourceGroup}'"
     working_dir = "${path.module}/azure-arm"
   }
 }
@@ -13,13 +13,18 @@ resource "null_resource" "Create_resource_group" {
 resource "null_resource" "Deploy_ARM_template" {
   depends_on = [null_resource.Create_resource_group]
   provisioner "local-exec" {
-    command     = "az deployment group create --name acme-deployment --resource-group teande-acme-rg --template-file og-arm.json --parameters og-arm-parameter.json"
+    command     = "az deployment group create --name acme-deployment --resource-group ${var.virtualNetworkResourceGroup} --template-file og-arm.json --parameters og-arm-parameter.json"
     working_dir = "${path.module}/azure-arm"
   }
 }
 
+resource "time_sleep" "wait_10_mins" {
+  depends_on      = [null_resource.Deploy_ARM_template]
+  create_duration = "10m"
+}
+
 resource "cdo_ftd_device" "ftd" {
-  depends_on         = [fmc_access_policies.fmc_access_policy, null_resource.Deploy_ARM_template]
+  depends_on         = [fmc_access_policies.fmc_access_policy, time_sleep.wait_10_mins]
   name               = var.ftd_name
   licenses           = ["BASE"]
   virtual            = true
@@ -38,31 +43,28 @@ resource "null_resource" "print_arm_outputs" {
   }
 }
 
-## Add the arm template code here...
-
-
 ## Onboarding the deployed FTD1
 resource "cdo_ftd_device_onboarding" "ftd1" {
   ftd_uid    = cdo_ftd_device.ftd.id
   depends_on = [cdo_ftd_device.ftd]
 }
-# resource "time_sleep" "wait_10_secs" {
-#   depends_on      = [cdo_ftd_device_onboarding.ftd1]
-#   create_duration = "10s"
-# }
+resource "time_sleep" "wait_for_initial_deployment" {
+  depends_on      = [cdo_ftd_device_onboarding.ftd1]
+  create_duration = "5m"
+}
 
 ## Add the config code here...
-# resource "null_resource" "pbr" {
-#   depends_on = [time_sleep.wait_10_sec]
+resource "null_resource" "configuration_apply" {
+  depends_on = [time_sleep.wait_for_initial_deployment]
 
-#   provisioner "local-exec" {
-#     command     = "terraform init && terraform apply -auto-approve -var='fmc_host=${var.cdfmc_host}' -var='cdo_token=${var.cdo_token}' -var='cdo_host=${local.www_cdo_host}' "
-#     working_dir = "${path.module}/config"
-#   }
+  provisioner "local-exec" {
+    command     = "terraform init && terraform apply -auto-approve -var='cdfmc_host=${var.cdfmc_host}' -var='cdo_token=${var.cdo_token}' -var='cdo_host=${var.cdo_host}' -var='ftd_name=${var.ftd_name}' -var-file='terraform.tfvars.ignore'"
+    working_dir = "${path.module}/config"
+  }
 
-#   provisioner "local-exec" {
-#     when        = destroy
-#     command     = "rm terraform.tfstate*"
-#     working_dir = "${path.module}/config"
-#   }
-# }
+  provisioner "local-exec" {
+    when        = destroy
+    command     = "rm terraform.tfstate*"
+    working_dir = "${path.module}/config"
+  }
+}

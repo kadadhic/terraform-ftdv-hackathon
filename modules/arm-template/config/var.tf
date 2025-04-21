@@ -15,3 +15,6 @@ variable "cdo_token" {
   type        = string
   description = "CDO Token"
 }
+variable "ftd_name" {
+  type = string
+}
