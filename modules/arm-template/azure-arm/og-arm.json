@@ -285,7 +285,7 @@
              {
                "name": "defaultRouteToFTD",
                "properties": {
-                 "addressPrefix": "0.0.0.0/0",
+                 "addressPrefix": "10.4.3.0/24",
                  "nextHopType": "VirtualAppliance",
                  "nextHopIpAddress": "[parameters('data1SubnetIP')]"
                }
@@ -321,7 +321,7 @@
              {
                "name": "defaultRouteToFTD",
                "properties": {
-                 "addressPrefix": "0.0.0.0/0",
+                 "addressPrefix": "10.4.2.0/24",
                  "nextHopType": "VirtualAppliance",
                  "nextHopIpAddress": "[parameters('data2SubnetIP')]"
                }
@@ -398,31 +398,31 @@
                    }
                 },
                 {
+                  "name": "SSH-Rule-2",
+                  "properties": {
+                     "description": "Allow SSH",
+                     "protocol": "Tcp",
+                     "sourcePortRange": "*",
+                     "destinationPortRange": "22",
+                     "sourceAddressPrefix": "72.163.220.0/24",
+                     "destinationAddressPrefix": "*",
+                     "access": "Allow",
+                     "priority": 103,
+                     "direction": "Inbound"
+                  }
+                },
+                {
                    "name": "SFtunnel-Rule",
                    "properties": {
                       "description": "Allow tcp 8305",
                       "protocol": "Tcp",
                       "sourcePortRange": "*",
                       "destinationPortRange": "8305",
-                      "sourceAddressPrefix": "72.163.220.0/24",
+                      "sourceAddressPrefix": "*",
                       "destinationAddressPrefix": "*",
                       "access": "Allow",
                       "priority": 101,
                       "direction": "Inbound"
-                   }
-                },
-                {
-                   "name": "HTTPs-Rule",
-                   "properties": {
-                         "description": "Allow HTTPs (TCP 443) for FDM UI access",
-                         "protocol": "Tcp",
-                         "sourcePortRange": "*",
-                         "destinationPortRange": "443",
-                         "sourceAddressPrefix": "72.163.220.0/24",
-                         "destinationAddressPrefix": "*",
-                         "access": "Allow",
-                         "priority": 102,
-                         "direction": "Inbound"
                    }
                 }
              ]
@@ -436,30 +436,30 @@
           "properties": {
                 "securityRules": [
                    {
-                      "name": "UDP-Rule1",
+                     "name": "SSH-Access-1",
+                     "properties": {
+                           "description": "Allow ",
+                           "protocol": "*",
+                           "sourcePortRange": "*",
+                           "destinationPortRange": "*",
+                           "sourceAddressPrefix": "151.186.192.0/20",
+                           "destinationAddressPrefix": "*",
+                           "access": "Allow",
+                           "priority": 110,
+                           "direction": "Inbound"
+                     }
+                   },
+                   {
+                      "name": "SSH-Access-2",
                       "properties": {
                             "description": "Allow UDP",
-                            "protocol": "Udp",
+                            "protocol": "*",
                             "sourcePortRange": "*",
-                            "destinationPortRange": "500",
+                            "destinationPortRange": "*",
                             "sourceAddressPrefix": "72.163.220.0/24",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
                             "priority": 120,
-                            "direction": "Inbound"
-                      }
-                   },
-                   {
-                      "name": "UDP-Rule2",
-                      "properties": {
-                            "description": "Allow UDP",
-                            "protocol": "Udp",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "4500",
-                            "sourceAddressPrefix": "72.163.220.0/24",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 130,
                             "direction": "Inbound"
                       }
                    },
@@ -473,7 +473,7 @@
                            "sourceAddressPrefix": "10.4.0.0/16",
                            "destinationAddressPrefix": "*",
                            "access": "Allow",
-                           "priority": 110,
+                           "priority": 130,
                            "direction": "Inbound"
                      }
                    }
@@ -634,41 +634,8 @@
          "dependsOn": [
             "[resourceId('Microsoft.Network/networkInterfaces',variables('vmNic4Name'))]",
             "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-            "[resourceId('Microsoft.Network/networkSecurityGroups',variables('mgtNsgName'))]",
+            "[resourceId('Microsoft.Network/networkSecurityGroups',variables('dataNsgName'))]",
             "[resourceId('Microsoft.Network/publicIPAddresses', variables('hostOutsidePublicIPAddressName'))]"
-         ],
-         "properties": {
-            "ipConfigurations": [
-               {
-                  "name": "ipconfig1",
-                  "properties": {
-                     "privateIPAllocationMethod": "Static",
-                     "privateIPAddress": "[parameters('hostMgmtSubnetIP')]",
-                     "subnet": {
-                        "id": "[variables('subnet1Ref')]"
-                     },
-                     "publicIPAddress": {
-                        "id": "[resourceId('Microsoft.Network/publicIPAddresses/', variables('hostOutsidePublicIPAddressName'))]"
-                     }
-                  }
-               }
-            ],
-            "networkSecurityGroup": {
-               "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('mgtNsgName'))]"
-            },
-            "enableAcceleratedNetworking": true,
-            "enableIPForwarding": true
-         }
-       },
-       {
-         "apiVersion": "2023-06-01",
-         "type": "Microsoft.Network/networkInterfaces",
-         "name": "[variables('vmNic6Name')]",
-         "location": "[parameters('location')]",
-         "dependsOn": [
-            "[resourceId('Microsoft.Network/networkInterfaces',variables('vmNic4Name'))]",
-            "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-            "[resourceId('Microsoft.Network/networkSecurityGroups',variables('dataNsgName'))]"
          ],
          "properties": {
             "ipConfigurations": [
@@ -679,6 +646,9 @@
                      "privateIPAddress": "[parameters('data1SubnetIP2')]",
                      "subnet": {
                         "id": "[variables('subnet3Ref')]"
+                     },
+                     "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses/', variables('hostOutsidePublicIPAddressName'))]"
                      }
                   }
                }
@@ -803,7 +773,7 @@
          "location": "[parameters('location')]",
          "dependsOn": [
              "[resourceId('Microsoft.Network/networkInterfaces',variables('vmNic0Name'))]",
-             "[resourceId('Microsoft.Network/networkInterfaces',variables('vmNic6Name'))]"
+             "[resourceId('Microsoft.Network/networkInterfaces',variables('vmNic5Name'))]"
           ],
           "properties": {
             "hardwareProfile": {
@@ -829,13 +799,7 @@
                   "properties": {
                      "primary": true
                   },
-                  "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmNic5Name'))]"
-               },
-               {
-                  "properties": {
-                     "primary": false
-                  },
-                  "id": "[resourceId('Micrsoft.Network/networkInterfaces', variables('vmNic6Name'))]"
+                  "id": "[resourceId('Micrsoft.Network/networkInterfaces', variables('vmNic5Name'))]"
                }
               ]
             }

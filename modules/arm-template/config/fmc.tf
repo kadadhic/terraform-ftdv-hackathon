@@ -76,20 +76,20 @@ data "fmc_access_policies" "access_policy" {
 resource "fmc_access_rules" "access_rule" {
   acp                = data.fmc_access_policies.access_policy.id
   section            = "mandatory"
-  name               = "allow-in-out"
+  name               = "allow-out-in"
   action             = "allow"
   enabled            = true
   send_events_to_fmc = true
   log_end            = true
   source_zones {
     source_zone {
-      id   = fmc_security_zone.inside.id
+      id   = fmc_security_zone.outside01.id
       type = "SecurityZone"
     }
   }
   destination_zones {
     destination_zone {
-      id   = fmc_security_zone.outside01.id
+      id   = fmc_security_zone.inside.id
       type = "SecurityZone"
     }
   }
@@ -102,36 +102,6 @@ resource "fmc_ftd_nat_policies" "nat_policy01" {
   name        = "NAT_Policy01"
   description = "Nat policy by terraform"
 }
-
-resource "fmc_ftd_manualnat_rules" "nat_rule01" {
-  nat_policy  = fmc_ftd_nat_policies.nat_policy01.id
-  description = "Created using terraform"
-  nat_type    = "static"
-  source_interface {
-    id   = fmc_security_zone.inside.id
-    type = "SecurityZone" //fmc_security_zone.inside.type
-  }
-  destination_interface {
-    id   = fmc_security_zone.outside01.id
-    type = "SecurityZone" //fmc_security_zone.outside01.type
-  }
-  original_source {
-    id   = fmc_network_objects.corporate-lan01.id
-    type = fmc_network_objects.corporate-lan01.type
-  }
-  # translated_network {
-  #     id = data.fmc_network_objects.public.id
-  #     type = data.fmc_network_objects.public.type
-  # }
-  interface_in_translated_source = true
-  # original_port {
-  #     port = 53
-  #     protocol = "udp"
-  # }
-  # translated_port = 5353
-  # ipv6 = true
-}
-
 
 ################################################################################################
 # Configuring physical interfaces
