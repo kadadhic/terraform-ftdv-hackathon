@@ -67,12 +67,10 @@ resource "fmc_host_objects" "outside01-gw" {
 ################################################################################################
 # Access Policy
 ################################################################################################
-# data "fmc_access_policies" "access_policy" {
-#   name = "FireGlass-access-policy"
-# }
 data "fmc_access_policies" "access_policy" {
-  name = "Test-access-policy"
+  name = var.access_policy
 }
+
 resource "fmc_access_rules" "access_rule" {
   acp                = data.fmc_access_policies.access_policy.id
   section            = "mandatory"
@@ -95,6 +93,7 @@ resource "fmc_access_rules" "access_rule" {
   }
   new_comments = ["Applied via terraform"]
 }
+
 ################################################################################################
 # Nat Policy
 ################################################################################################
@@ -106,7 +105,6 @@ resource "fmc_ftd_nat_policies" "nat_policy01" {
 ################################################################################################
 # Configuring physical interfaces
 ################################################################################################
-#1st Device
 resource "fmc_device_physical_interfaces" "physical_interfaces00" {
   enabled                = true
   device_id              = data.fmc_devices.device01.id

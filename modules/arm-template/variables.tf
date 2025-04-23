@@ -66,3 +66,8 @@ variable "virtualNetworkResourceGroup" {
   type    = string
   default = "arm-ftdv-rg"
 }
+
+variable "access_policy" {
+  type    = string
+  default = "arm-access-policy"
+}

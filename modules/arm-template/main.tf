@@ -1,5 +1,5 @@
 resource "fmc_access_policies" "fmc_access_policy" {
-  name           = "Test-access-policy"
+  name           = var.access_policy
   default_action = "PERMIT"
 }
 
@@ -58,7 +58,7 @@ resource "null_resource" "configuration_apply" {
   depends_on = [time_sleep.wait_for_initial_deployment]
 
   provisioner "local-exec" {
-    command     = "terraform init && terraform apply -auto-approve -var='cdfmc_host=${var.cdfmc_host}' -var='cdo_token=${var.cdo_token}' -var='cdo_host=${var.cdo_host}' -var='ftd_name=${var.ftd_name}' -var-file='terraform.tfvars.ignore'"
+    command     = "terraform init && terraform apply -auto-approve -var-file='terraform.tfvars' "
     working_dir = "${path.module}/config"
   }
 
