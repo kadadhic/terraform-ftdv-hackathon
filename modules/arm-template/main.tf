@@ -37,7 +37,7 @@ resource "null_resource" "print_arm_outputs" {
   provisioner "local-exec" {
     command     = <<EOT
     echo "Fetching public IPs from ARM deployment..."
-    .venv/bin/python3 cdo.py --host $(az deployment group show --resource-group teande-acme-rg --name acme-deployment --query "properties.outputs.vmMgmtPublicIP.value" -o tsv | tr -d '\r\n') --username admin --password Cisco@123 --gen_command '${cdo_ftd_device.ftd.generated_command}'
+    .venv/bin/python3 cdo.py --host $(az deployment group show --resource-group ${var.virtualNetworkResourceGroup} --name acme-deployment --query "properties.outputs.vmMgmtPublicIP.value" -o tsv | tr -d '\r\n') --username admin --password Cisco@123 --gen_command '${cdo_ftd_device.ftd.generated_command}'
     EOT
     interpreter = ["/bin/bash", "-c"]
   }
@@ -46,7 +46,7 @@ resource "null_resource" "print_arm_outputs" {
 ## Onboarding the deployed FTD1
 resource "cdo_ftd_device_onboarding" "ftd1" {
   ftd_uid    = cdo_ftd_device.ftd.id
-  depends_on = [cdo_ftd_device.ftd]
+  depends_on = [cdo_ftd_device.ftd, null_resource.print_arm_outputs]
 }
 resource "time_sleep" "wait_for_initial_deployment" {
   depends_on      = [cdo_ftd_device_onboarding.ftd1]
@@ -58,7 +58,7 @@ resource "null_resource" "configuration_apply" {
   depends_on = [time_sleep.wait_for_initial_deployment]
 
   provisioner "local-exec" {
-    command     = "terraform init && terraform apply -auto-approve -var-file='terraform.tfvars' "
+    command     = "terraform init && terraform apply -auto-approve -var='cdo_token=${var.cdo_token}' -var='cdfmc_host=${var.cdfmc_host}' -var='access_policy=${var.access_policy}' -var='ftd_name=${var.ftd_name}'"
     working_dir = "${path.module}/config"
   }
 

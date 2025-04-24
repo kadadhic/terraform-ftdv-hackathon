@@ -38,7 +38,7 @@ data "fmc_device_physical_interfaces" "one_physical_interface_device01" {
 # Security Zones
 ################################################################################################
 resource "fmc_security_zone" "inside" {
-  name           = "InZone"
+  name           = "InZone01"
   interface_mode = "ROUTED"
 }
 resource "fmc_security_zone" "outside01" {
