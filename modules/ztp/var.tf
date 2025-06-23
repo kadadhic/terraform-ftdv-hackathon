@@ -1,10 +1,10 @@
-variable "scc_token" {
+variable "cdo_token" {
   type        = string
-  description = "API Token of your SCC environment"
+  description = "CDO Token"
 }
-variable "scc_host" {
+variable "cdo_host" {
   type        = string
-  description = "This is the URL you enter when logging into your SCC account"
+  description = "This is the URL you enter when logging into your CDO account"
 }
 variable "cdfmc_host" {
   type        = string
